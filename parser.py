@@ -26,7 +26,7 @@ class Parser(object):
     return circuit
    
   # Use RegExp to parse and create a circuit object which is returned
-  def _parseLine(self,line):
+  def _parseLine(self, line):
     result = self._checkCase(line)
     if (result == 0):
       return self._getNewInput(line)
@@ -92,12 +92,15 @@ class Parser(object):
     # Strip whitespaces from string and then split in a list of arguments
     fan_in_nodes = str(match_object.group(3)).strip().split(',')
     # Create the new circuit object
-    gate_node = cr.GateNode(assigned_node,fan_in_nodes)
+    gate_node = cr.GateNode(assigned_node,fan_in_nodes, [assigned_node])
 
     if (gate_name == "AND"):
       gate_node.function = cr.__AND__
     elif (gate_name == "OR"):
       gate_node.function = cr.__OR__
-    # so on...
+    elif (gate_name == "NOT"):
+      gate_node.function = cr.__NOT__
+
+    # maybe add some other
 
     return gate_node

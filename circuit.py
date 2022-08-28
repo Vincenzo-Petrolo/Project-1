@@ -33,9 +33,17 @@ class Circuit(object):
     formatted_string = f"Circuit name: {self.name}"
     inputs_string = f"Inputs: {self.inputs}"
     outputs_string = f"Outputs: {self.outputs}"
+    nodes_string = "Nodes list:\n"
 
-    nodes_string = f"Nodes list: {list(self.nodes.keys())}"
-    final_string = formatted_string + '\n' + inputs_string + '\n' + outputs_string + '\n' + nodes_string
+    for node in self.nodes.values():
+      if isinstance(node, GateNode):
+        nodes_string += str(node)
+    
+    final_string = formatted_string + '\n' \
+                    + inputs_string + '\n' \
+                    + outputs_string + '\n'\
+                    + nodes_string
+    
     return decorator + '\n' + final_string + '\n' + decorator
 
 class Node(object):
@@ -98,7 +106,9 @@ class GateNode(Node):
     return None
 
   def __str__(self):
-    return f"Gate node of name: {self.name}\nFunction:{self.function.__name__}\nFan-in: {self.fan_in}\nFan-out: {self.fan_out}"
+    return f"\nGate node of name: {self.name}\n" \
+    f"Function: {len(self.fan_in)}-{len(self.fan_out)} {self.function.__name__.strip('_')}\n" \
+    f"Fan-in: {self.fan_in}\nFan-out: {self.fan_out}\n"
 
 
 # And function of a gate
@@ -106,6 +116,9 @@ def __AND__(self):
   pass
 
 def __OR__(self):
+  pass
+
+def __NOT__(self):
   pass
 
 # ... more to be added

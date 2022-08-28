@@ -4,9 +4,10 @@ import parser as p
 # Create the parser object
 parser = p.Parser()
 
-# Read file and get the circuit
+filename = input("Please write the name of the file you want to read: ")
+# Read the file and get the circuit
 
-circuit = parser.readFile("test.bench")
+circuit = parser.readFile(filename)
 
 # Print the circuit
 print(circuit)
