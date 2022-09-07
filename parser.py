@@ -16,6 +16,8 @@ class Parser(object):
       # Get all the lines in the file
       lines = f.readlines()
       for line in lines:
+        if (line.strip().startswith('#')) or line == "\n":
+          continue
         # Get a new circuit object
         new_circ_object = self._parseLine(line)
         # Add the object to the circuit
@@ -90,7 +92,7 @@ class Parser(object):
     assigned_node = match_object.group(1)
     gate_name = match_object.group(2)
     # Strip whitespaces from string and then split in a list of arguments
-    fan_in_nodes = str(match_object.group(3)).strip().split(',')
+    fan_in_nodes = str(match_object.group(3)).replace(' ', '').split(',')
     # Create the new circuit object
     gate_node = cr.GateNode(assigned_node,fan_in_nodes, [assigned_node])
 

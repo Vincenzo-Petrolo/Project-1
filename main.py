@@ -1,4 +1,4 @@
-# Homework 1 python code
+# Homework 2 python code
 import parser as p
 
 # Create the parser object
@@ -9,5 +9,4 @@ filename = input("Please write the name of the file you want to read: ")
 
 circuit = parser.readFile(filename)
 
-# Print the circuit
-print(circuit)
+circuit.displayLevelize()

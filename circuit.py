@@ -1,38 +1,35 @@
 # Circuit module, it aims at representing the circuit read from the file
-
 class Circuit(object):
   def __init__(self, name):
     # Name for the current circuit
     self.name = name
-    # Initialize an empty list of inputs
-    self.inputs = []
-    # Initialize an empty list of outputs
-    self.outputs = []
+    # Initialize an empty dictionary of inputs
+    self.inputs = {}
+    # Initialize an empty dictionary of outputs
+    self.outputs = {}
     # Initialize an empty dictionary of nodes, useful for graph traversal
     self.nodes = {}
 
   def _addInput(self, input_node):
-    self.inputs.append(input_node.name)
+    self.inputs[input_node.name] = input_node
 
 
   def _addOutput(self, output_node):
-    self.outputs.append(output_node.name)
-
+    self.outputs[output_node.name] = output_node
 
   def addNode(self, node):
-    # Add the node to the dictionary
-    self.nodes[node.getName()] = node
-
     if isinstance(node, InputNode):
       self._addInput(node)
     elif isinstance(node, OutputNode):
       self._addOutput(node)
+    else:
+      self.nodes[node.getName()] = node
 
   def __str__(self):
     decorator = "================================"
     formatted_string = f"Circuit name: {self.name}"
-    inputs_string = f"Inputs: {self.inputs}"
-    outputs_string = f"Outputs: {self.outputs}"
+    inputs_string = f"Inputs: {sorted(self.inputs.keys())}"
+    outputs_string = f"Outputs: {sorted(self.outputs.keys())}"
     nodes_string = "Nodes list:\n"
 
     for node in self.nodes.values():
@@ -46,6 +43,58 @@ class Circuit(object):
     
     return decorator + '\n' + final_string + '\n' + decorator
 
+  def levelize(self):
+    finish = False
+    # create a dictionary for the levels
+    self.levels = {}
+    # assign default value to all inputs
+    for nodeName in self.nodes.keys():
+      self.levels[nodeName] = -1
+    # initialize the input level to 0
+    for nodeName in self.inputs.keys():
+      self.levels[nodeName] = 0
+    # until every gate is not assigned 
+    # with a valid level do the loop
+    while finish is False:
+      finish = True
+      for node in self.nodes.values():
+        # get the inputs from the node
+        inputs = node.fan_in
+        if (self._nodeIsValid(inputs) is True):
+          self.levels[node.name] = self._computeLevel(inputs)
+        else:
+          finish = False
+          continue
+
+  def displayLevelize(self):
+    # first levelize the circuit
+    self.levelize()
+    # Create a list of lists using the maximum level
+    max_level = max(self.levels.values())
+    
+    for i in range(0,max_level+1):
+      node_names = [k for k,v in self.levels.items() if v == i]
+      print(f"LEVEL({i}): {node_names}\n")
+
+    
+  def _computeLevel(self, inputs):
+    # create an empty list of levels
+    levels = []
+
+    for input in inputs:
+      levels.append(self.levels[input])
+    
+    return max(levels) + 1
+  
+  def _nodeIsValid(self, inputs):
+    for input in inputs:
+      if (self.levels[input] < 0):
+        return False
+
+    return True
+        
+      
+    
 class Node(object):
   def __init__(self, node_name):
     self.name = node_name
@@ -109,6 +158,7 @@ class GateNode(Node):
     return f"\nGate node of name: {self.name}\n" \
     f"Function: {len(self.fan_in)}-{len(self.fan_out)} {self.function.__name__.strip('_')}\n" \
     f"Fan-in: {self.fan_in}\nFan-out: {self.fan_out}\n"
+
 
 
 # And function of a gate
