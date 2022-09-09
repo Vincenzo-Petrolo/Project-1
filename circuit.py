@@ -74,7 +74,7 @@ class Circuit(object):
     
     for i in range(0,max_level+1):
       node_names = [k for k,v in self.levels.items() if v == i]
-      print(f"LEVEL({i}): {node_names}\n")
+      print(f"LEVEL({i}): {'[%s]' % ', '.join(map(str, node_names))}")
 
     
   def _computeLevel(self, inputs):
