@@ -71,10 +71,12 @@ class Circuit(object):
     self.levelize()
     # Create a list of lists using the maximum level
     max_level = max(self.levels.values())
-    
+    print("#"*30)
+    print("Circuit levels")
     for i in range(0,max_level+1):
       node_names = [k for k,v in self.levels.items() if v == i]
       print(f"LEVEL({i}): {'[%s]' % ', '.join(map(str, node_names))}")
+    print("#"*30)
 
     
   def _computeLevel(self, inputs):
