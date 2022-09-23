@@ -164,14 +164,89 @@ class GateNode(Node):
 
 
 # And function of a gate
-def __AND__(self):
-  pass
+def __AND__(inputs_list):
+  if ('0' in inputs_list):
+    return '0'
+  if ('X' in inputs_list):
+    return 'X'
+  # if there's no 0 in the inputs
+  # we check if there's at least one Unknown
+  if ('U' in inputs_list):
+    return 'U'
 
-def __OR__(self):
-  pass
+  return '1'
 
-def __NOT__(self):
-  pass
-
-# ... more to be added
+def __NAND__(inputs_list):
+  if ('0' in inputs_list):
+    return '1'
+  if ('X' in inputs_list):
+    return 'X'
+  # if there's no 0 in the inputs
+  # we check if there's at least one Unknown
+  if ('U' in inputs_list):
+    return 'U'
   
+  return '0'
+
+def __OR__(inputs_list):
+  if ('1' in inputs_list):
+    return '1'
+  if ('X' in inputs_list):
+    return 'X'
+  # if there's no 0 in the inputs
+  # we check if there's at least one Unknown
+  if ('U' in inputs_list):
+    return 'U'
+  
+  return '0'
+
+def __NOR__(inputs_list):
+  if ('1' in inputs_list):
+    return '0'
+  if ('X' in inputs_list):
+    return 'X'
+  # if there's no 0 in the inputs
+  # we check if there's at least one Unknown
+  if ('U' in inputs_list):
+    return 'U'
+  
+  return '1'
+
+def __XOR__(inputs_list):
+  if ('X' in inputs_list):
+    return 'X'
+  if  ('U' in inputs_list):
+    return 'U'
+  number_ones = inputs_list.count('1')
+
+  # if the number of ones is even
+  if (number_ones % 2 == 0):
+    return '0'
+  # if the number of ones is odd
+  return '1'
+  
+def __XNOR__(inputs_list):
+  if ('X' in inputs_list):
+    return 'X'
+  if  ('U' in inputs_list):
+    return 'U'
+  number_ones = inputs_list.count('1')
+
+  # if the number of ones is even
+  if (number_ones % 2 == 0):
+    return '1'
+  # if the number of ones is odd
+  return '0'
+
+def __NOT__(inputs_list):
+  if ('X' in inputs_list):
+    return 'X'
+  if ('U' in inputs_list):
+    return 'U'
+  if ('0' in inputs_list):
+    return '1'
+
+  return '0'
+
+def __BUF__(inputs_list):
+  return inputs_list[0]

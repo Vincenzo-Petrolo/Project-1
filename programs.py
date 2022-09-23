@@ -1,13 +1,34 @@
+import os
+import parser as p
+import simulation as sim
+
 # Single TV - Single Fault program
 def program1():
-  print("Program 1 starting...")
-# Create the parser object
-#  parser = p.Parser()
-
-#  circuit = parser.readFile(filename)
+  # Clear the screen from previous output
+  os.system("clear")
+  print("Single TV - Single Fault program")
+  # Create the parser object
+  parser = p.Parser()
+  # Ask the user for the filename
+  filename = input("Insert the name of the file you want to load [default circ.bench]: ")
+  os.system("clear")
+  # default to circ.bench
+  if (len(filename) == 0):
+    filename = "circ.bench"
+  # Now load the file into the circuit data structure
+  circuit = parser.readFile(filename)
+  # Print informations about the circuit
+  print(f"Circuit {filename}:")
+  print(f"Input vector size: {len(circuit.inputs)}")
+  print(f"Output vector size: {len(circuit.outputs)}")
+  # Show more detailed informations
+  input("Press Enter to continue and show detailed description of the circuit...")
+  os.system("clear")
+  print(circuit)
+  os.system("clear")
+  simulation = sim.Simulation(circuit)
+  simulation.simulate()
   
-#  circuit.displayLevelize()
-
   pass
 
 # Single TV - All faults

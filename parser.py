@@ -98,11 +98,19 @@ class Parser(object):
 
     if (gate_name == "AND"):
       gate_node.function = cr.__AND__
+    elif (gate_name == "NAND"):
+      gate_node.function = cr.__NAND__
     elif (gate_name == "OR"):
       gate_node.function = cr.__OR__
+    elif (gate_name == "NOR"):
+      gate_node.function = cr.__NOR__
+    elif (gate_name == "XOR"):
+      gate_node.function = cr.__XOR__
+    elif (gate_name == "XNOR"):
+      gate_node.function = cr.__XNOR__
     elif (gate_name == "NOT"):
       gate_node.function = cr.__NOT__
-
-    # maybe add some other
+    elif (gate_name == "BUF"):
+      gate_node.function = cr.__BUF__
 
     return gate_node
