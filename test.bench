@@ -1,6 +1,5 @@
 INPUT(a)
 INPUT(b)
-# sajinsn
 
 c' = NOT(c)
 w = AND(a, b, c)

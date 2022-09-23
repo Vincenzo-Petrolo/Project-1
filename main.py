@@ -1,12 +1,37 @@
-# Homework 2 python code
-import parser as p
+# Project 1 main
 
-# Create the parser object
-parser = p.Parser()
+from programs import program1,program2,program3
 
-filename = input("Please write the name of the file you want to read: ")
-# Read the file and get the circuit
+def main():  
+  #menu description
+  menu =  "############  MENU ##############\n"+\
+          "[1] Single TV - Single Fault\n"+\
+          "[2] Single TV - All Faults\n"+\
+          "[3] Fault coverage of 1-10 TVs\n"+\
+          "############  MENU ##############\n"
+  
+  choice = 0
+  
+  # Show the menu
+  while (choice not in [1,2,3]):
+    print(menu)
+    choice = int(input("Write the number of the program you want to execute: "))
+    
+  # Once the user makes a choice, run the specific program
+  if (choice == 1):
+    program1()
+    return;
+  elif (choice == 2):
+    program2()
+    return;
+  elif (choice == 3):
+    program3()
+    return;
+  else:
+    print("Error on the choice, returning")
+    return
 
-circuit = parser.readFile(filename)
 
-circuit.displayLevelize()
+if __name__ == "__main__":
+  main()
+
