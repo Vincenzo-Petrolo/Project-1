@@ -25,6 +25,7 @@ def program1():
   input("Press Enter to continue and show detailed description of the circuit...")
   os.system("clear")
   print(circuit)
+  input("Press Enter to enter the simulation phase...")
   os.system("clear")
   simulation = sim.Simulation(circuit)
   simulation.simulate()

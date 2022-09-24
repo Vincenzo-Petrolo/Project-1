@@ -25,7 +25,10 @@ class Simulation(object):
       return
     # get the node
     node = self.circuit.nodes[node_name]
-    inputs = node.getFanIn()
+    inputs_names = node.getFanIn()
+    inputs = []
+    for i in inputs_names:
+      inputs.append(self.simTable[i])
     output = node.function(inputs)
     # Now update the table
     self.simTable[node_name] = output
