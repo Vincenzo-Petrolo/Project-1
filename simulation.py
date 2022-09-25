@@ -66,7 +66,8 @@ class Simulation(object):
         self._compute(node)
 
     print(self.simTable)
-    
+    print(f"Fault detected: {self._isFaultDetected()}")
+  
   def _get_inputs(self):
     inputs_names = ""
     for i in self.inputs:
@@ -104,3 +105,9 @@ class Simulation(object):
       "fault" : 'D' if (fault[2] == '0') else "D'"
     }
     return True
+
+  def _isFaultDetected(self):
+    for output_name in self.outputs:
+      if self.simTable[output_name] == "D" or self.simTable[output_name] == "D'":
+        return True
+    return False
