@@ -163,6 +163,9 @@ class GateNode(Node):
 
 
 
+# Those functions implement the D-algebra operations
+# Their supported alphabet is [0,1,U,D,D']
+
 # And function of a gate
 def __AND__(inputs_list):
   if ('0' in inputs_list):
@@ -173,6 +176,11 @@ def __AND__(inputs_list):
   # we check if there's at least one Unknown
   if ('U' in inputs_list):
     return 'U'
+  # At this point I have all 1s or a D/D'
+  if ('D' in inputs_list):
+    return 'D'
+  elif ("D'" in inputs_list):
+    return "D'"
 
   return '1'
 
@@ -185,7 +193,11 @@ def __NAND__(inputs_list):
   # we check if there's at least one Unknown
   if ('U' in inputs_list):
     return 'U'
-  
+  # At this point I have all 1s or a D/D'
+  if ('D' in inputs_list):
+    return 'D'
+  elif ("D'" in inputs_list):
+    return "D'"  
   return '0'
 
 def __OR__(inputs_list):
@@ -197,7 +209,12 @@ def __OR__(inputs_list):
   # we check if there's at least one Unknown
   if ('U' in inputs_list):
     return 'U'
-  
+    # At this point I have all 1s or a D/D'
+  if ('D' in inputs_list):
+    return 'D'
+  elif ("D'" in inputs_list):
+    return "D'"
+    
   return '0'
 
 def __NOR__(inputs_list):
@@ -209,7 +226,12 @@ def __NOR__(inputs_list):
   # we check if there's at least one Unknown
   if ('U' in inputs_list):
     return 'U'
-  
+    # At this point I have all 1s or a D/D'
+  if ('D' in inputs_list):
+    return 'D'
+  elif ("D'" in inputs_list):
+    return "D'"
+    
   return '1'
 
 def __XOR__(inputs_list):
@@ -219,6 +241,16 @@ def __XOR__(inputs_list):
     return 'U'
   number_ones = inputs_list.count('1')
 
+    # At this point I have all 1s or a D/D'
+  if ('D' in inputs_list):
+    if (number_ones % 2 == 0):
+      return "D"
+    return "D'"
+  elif ("D'" in inputs_list):
+    if (number_ones % 2 == 0):
+      return "D'"
+    return "D"
+  
   # if the number of ones is even
   if (number_ones % 2 == 0):
     return '0'
@@ -231,7 +263,16 @@ def __XNOR__(inputs_list):
   if  ('U' in inputs_list):
     return 'U'
   number_ones = inputs_list.count('1')
-
+  
+    # At this point I have all 1s or a D/D'
+  if ('D' in inputs_list):
+    if (number_ones % 2 == 0):
+      return "D'"
+    return "D"
+  elif ("D'" in inputs_list):
+    if (number_ones % 2 == 0):
+      return "D"
+    return "D'"
   # if the number of ones is even
   if (number_ones % 2 == 0):
     return '1'
@@ -243,6 +284,12 @@ def __NOT__(inputs_list):
     return 'X'
   if ('U' in inputs_list):
     return 'U'
+  # D-algebra support
+  if ('D' in inputs_list):
+    return "D'"
+  elif ("D'" in inputs_list):
+    return "D"
+  
   if ('0' in inputs_list):
     return '1'
 

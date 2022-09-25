@@ -29,9 +29,11 @@ def program1():
   os.system("clear")
   simulation = sim.Simulation(circuit)
   simulation.simulate()
+  input("Press Enter to enter the fault simulation phase...")
+  os.system("clear")
+  fault = input("Write a single stuck-at fault (e.g. g-c-1) : ")
+  simulation.simulate(fault)
   
-  pass
-
 # Single TV - All faults
 def program2():
   print("Program 2 starting...")
