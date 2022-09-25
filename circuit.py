@@ -94,7 +94,34 @@ class Circuit(object):
         return False
 
     return True
-        
+
+  def printFullFaultList(self):
+    faults_number = 0
+    # Count the faults for each gate node
+    for gate_node in self.nodes.values():
+      # 2 faults for each input + 2 fault for the output
+      faults_number += 2*len(gate_node.getFanIn())
+      faults_number += 2
+      # now print it
+      for fan_in in gate_node.getFanIn():
+        print(f"{gate_node.name}-{fan_in}-0")
+        print(f"{gate_node.name}-{fan_in}-1")
+      print(f"{gate_node.name}-0")
+      print(f"{gate_node.name}-1")
+
+    # now print the faults for the inputs
+    for input_name in self.inputs:
+      faults_number += 2
+      print(f"{input_name}-0")
+      print(f"{input_name}-1")
+    for output_name in self.outputs:
+      faults_number += 2
+      print(f"{output_name}-0")
+      print(f"{output_name}-1")
+
+    print(f"Total number of faults: {faults_number}")
+
+    
       
     
 class Node(object):
