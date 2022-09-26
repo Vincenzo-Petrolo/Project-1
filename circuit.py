@@ -95,32 +95,29 @@ class Circuit(object):
 
     return True
 
-  def printFullFaultList(self):
-    faults_number = 0
-    # Count the faults for each gate node
+    
+
+  def getFullFaultList(self):
+    fault_list = []
+    
     for gate_node in self.nodes.values():
-      # 2 faults for each input + 2 fault for the output
-      faults_number += 2*len(gate_node.getFanIn())
-      faults_number += 2
-      # now print it
       for fan_in in gate_node.getFanIn():
-        print(f"{gate_node.name}-{fan_in}-0")
-        print(f"{gate_node.name}-{fan_in}-1")
-      print(f"{gate_node.name}-0")
-      print(f"{gate_node.name}-1")
+        fault_list.append(f"{gate_node.name}-{fan_in}-0")
+        fault_list.append(f"{gate_node.name}-{fan_in}-1")
+        
+      fault_list.append(f"{gate_node.name}-0")
+      fault_list.append(f"{gate_node.name}-1")
+
 
     # now print the faults for the inputs
     for input_name in self.inputs:
-      faults_number += 2
-      print(f"{input_name}-0")
-      print(f"{input_name}-1")
+      fault_list.append(f"{input_name}-0")
+      fault_list.append(f"{input_name}-1")
     for output_name in self.outputs:
-      faults_number += 2
-      print(f"{output_name}-0")
-      print(f"{output_name}-1")
+      fault_list.append(f"{output_name}-0")
+      fault_list.append(f"{output_name}-1")
 
-    print(f"Total number of faults: {faults_number}")
-
+    return fault_list
     
       
     
@@ -203,6 +200,8 @@ def __AND__(inputs_list):
   # we check if there's at least one Unknown
   if ('U' in inputs_list):
     return 'U'
+  if ('D' in inputs_list and "D'" in inputs_list):
+    return '0'
   # At this point I have all 1s or a D/D'
   if ('D' in inputs_list):
     return 'D'
@@ -220,6 +219,8 @@ def __NAND__(inputs_list):
   # we check if there's at least one Unknown
   if ('U' in inputs_list):
     return 'U'
+  if ('D' in inputs_list and "D'" in inputs_list):
+    return '0'
   # At this point I have all 1s or a D/D'
   if ('D' in inputs_list):
     return 'D'
@@ -236,6 +237,8 @@ def __OR__(inputs_list):
   # we check if there's at least one Unknown
   if ('U' in inputs_list):
     return 'U'
+  if ('D' in inputs_list and "D'" in inputs_list):
+    return '1'
     # At this point I have all 1s or a D/D'
   if ('D' in inputs_list):
     return 'D'
@@ -253,6 +256,8 @@ def __NOR__(inputs_list):
   # we check if there's at least one Unknown
   if ('U' in inputs_list):
     return 'U'
+  if ('D' in inputs_list and "D'" in inputs_list):
+    return '0'
     # At this point I have all 1s or a D/D'
   if ('D' in inputs_list):
     return 'D'
@@ -268,21 +273,42 @@ def __XOR__(inputs_list):
     return 'U'
   number_ones = inputs_list.count('1')
 
-    # At this point I have all 1s or a D/D'
-  if ('D' in inputs_list):
-    if (number_ones % 2 == 0):
-      return "D"
-    return "D'"
-  elif ("D'" in inputs_list):
-    if (number_ones % 2 == 0):
+  if ("D" in inputs_list or "D'" in inputs_list):
+    # we enter in good/bad simulation
+    # create two lists of inputs, good & bad
+    good_inps = []
+    bad_inps = []
+    for item in inputs_list:
+      if (item == "D"):
+        good_inps.append('1')
+        bad_inps.append('0')
+      elif (item == "D'"):
+        good_inps.append('0')
+        bad_inps.append('1')
+      else:
+        good_inps.append(item)
+        bad_inps.append(item)
+    # now that we have the two lists
+    good_result = __XOR__(good_inps)
+    bad_result = __XOR__(bad_inps)
+
+    # now compare the results to produce the D-algebra result
+    if (good_result == '1' and bad_result == '1'):
+      return '1'
+    elif (good_result == '1' and bad_result == '0'):
+      return 'D'
+    elif (good_result == '0' and bad_result == '1'):
       return "D'"
-    return "D"
-  
-  # if the number of ones is even
-  if (number_ones % 2 == 0):
-    return '0'
-  # if the number of ones is odd
-  return '1'
+    else:
+      return '0'
+    
+  else:
+    # continue with normal simulatio  
+    # if the number of ones is even
+    if (number_ones % 2 == 0):
+      return '0'
+    # if the number of ones is odd
+    return '1'
   
 def __XNOR__(inputs_list):
   if ('X' in inputs_list):
@@ -290,22 +316,44 @@ def __XNOR__(inputs_list):
   if  ('U' in inputs_list):
     return 'U'
   number_ones = inputs_list.count('1')
-  
-    # At this point I have all 1s or a D/D'
-  if ('D' in inputs_list):
-    if (number_ones % 2 == 0):
-      return "D'"
-    return "D"
-  elif ("D'" in inputs_list):
-    if (number_ones % 2 == 0):
-      return "D"
-    return "D'"
-  # if the number of ones is even
-  if (number_ones % 2 == 0):
-    return '1'
-  # if the number of ones is odd
-  return '0'
 
+  if ("D" in inputs_list or "D'" in inputs_list):
+    # we enter in good/bad simulation
+    # create two lists of inputs, good & bad
+    good_inps = []
+    bad_inps = []
+    for item in inputs_list:
+      if (item == "D"):
+        good_inps.append('1')
+        bad_inps.append('0')
+      elif (item == "D'"):
+        good_inps.append('0')
+        bad_inps.append('1')
+      else:
+        good_inps.append(item)
+        bad_inps.append(item)
+    # now that we have the two lists
+    good_result = __XNOR__(good_inps)
+    bad_result = __XNOR__(bad_inps)
+
+    # now compare the results to produce the D-algebra result
+    if (good_result == '1' and bad_result == '1'):
+      return '1'
+    elif (good_result == '1' and bad_result == '0'):
+      return 'D'
+    elif (good_result == '0' and bad_result == '1'):
+      return "D'"
+    else:
+      return '0'
+    
+  else:
+    # continue with normal simulatio  
+    # if the number of ones is even
+    if (number_ones % 2 == 0):
+      return '1'
+    # if the number of ones is odd
+    return '0'
+    
 def __NOT__(inputs_list):
   if ('X' in inputs_list):
     return 'X'
