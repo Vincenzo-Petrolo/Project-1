@@ -6,7 +6,30 @@ class Simulation(object):
         self.circuit = circuit
         self.simTable = {}
         self.initialSimTable = {}
+        # store inside this dictionary the fault, and 0 or 1 if it is detected or not
+        self.faults = {}
         self._initialize()
+        self._initFaults()
+
+    def simulate(self, faults=None):
+        # Initialize the simulation table
+        self._initialize()
+
+        # check if i need to perform fault simulation or not
+        if (faults is not None):
+          self._faultSimulation(faults)
+        else:  # start the simulation without fault
+          self._normalSimulation()
+
+    def _initFaults(self):
+        full_fault_list = self.circuit.getFullFaultList()
+
+        for fault in full_fault_list:
+            self.faults[fault] = 0
+    
+    def getFaultCoverage(self):
+        # count the number of ones in the dictionary
+        return int(list(self.faults.values()).count(1) / len(self.faults.keys()) * 100)
 
     def _goalIsReached(self):
         for node in self.simTable.keys():
@@ -17,7 +40,7 @@ class Simulation(object):
 
     def _initialize(self):
         # reset the fault if any
-        self.fault = {"node": "", "input": "", "fault": "", "type" : 0}
+        self.fault = {"node": "", "input": "", "fault": "", "type": 0}
         for node in self.circuit.nodes.values():
           self.simTable[node.name] = 'X'
 
@@ -46,21 +69,11 @@ class Simulation(object):
             # Now update the table
             self.simTable[node_name] = output
 
-    def simulate(self, faults=None):
-        # Initialize the simulation table
-        self._initialize()
-      
-        # check if i need to perform fault simulation or not
-        if (faults is not None):
-          self._faultSimulation(faults)
-        else: # start the simulation without fault
-          self._normalSimulation()
-    
     def _normalSimulation(self):
       while (self._goalIsReached() == False):
         for node in self.simTable:
           self._compute(node)
-    
+
     def _faultSimulation(self, fault_list):
       totalDetectedFaults = 0
       for fault in fault_list:
@@ -77,20 +90,28 @@ class Simulation(object):
         while (self._goalIsReached() == False):
             for node in self.simTable:
               self._compute(node)
-        print(f"{self.simTable} for {fault}")
+        # print(f"{self.simTable} for {fault}")
         if (self._isFaultDetected()):
-          totalDetectedFaults += 1
-      print(f"Total faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")   
+            self.faults[fault] = 1
+            totalDetectedFaults += 1
+      print(
+          f"Total faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")
 
-    def _get_inputs(self):
+    def _get_inputs(self, tv=None):
+
         inputs_names = ""
         for i in self.inputs:
-            inputs_names += i
-        formatted_string = "Write the input test vector " + inputs_names + "= "
-        input_string = input(formatted_string)
-        input_string = input_string
+            inputs_names += i + ' '
+
+        if (tv is None):
+            formatted_string = "Write the input test vector " + inputs_names + "= "
+            input_string = input(formatted_string)
+            input_string = input_string
+        else:
+            input_string = tv
+
         i = 0
-        for input_node in inputs_names:
+        for input_node in self.circuit.inputs:
             self.simTable[input_node] = input_string[i]
             self.initialSimTable[input_node] = input_string[i]
             i += 1

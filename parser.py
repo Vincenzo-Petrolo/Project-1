@@ -110,7 +110,7 @@ class Parser(object):
       gate_node.function = cr.__XNOR__
     elif (gate_name == "NOT"):
       gate_node.function = cr.__NOT__
-    elif (gate_name == "BUF"):
+    elif (gate_name == "BUFF"):
       gate_node.function = cr.__BUF__
 
     return gate_node

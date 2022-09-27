@@ -1,0 +1,4 @@
+INPUT(a)
+INPUT(b)
+OUTPUT(c)
+c = OR(a,b)
