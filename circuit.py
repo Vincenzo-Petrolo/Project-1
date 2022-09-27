@@ -289,6 +289,7 @@ def __XOR__(inputs_list):
         good_inps.append(item)
         bad_inps.append(item)
     # now that we have the two lists
+    # recursive call to the XOR function
     good_result = __XOR__(good_inps)
     bad_result = __XOR__(bad_inps)
 

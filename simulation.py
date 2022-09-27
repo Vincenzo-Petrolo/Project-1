@@ -88,11 +88,11 @@ class Simulation(object):
             inputs_names += i
         formatted_string = "Write the input test vector " + inputs_names + "= "
         input_string = input(formatted_string)
-        self.input_string = input_string
+        input_string = input_string
         i = 0
         for input_node in inputs_names:
             self.simTable[input_node] = input_string[i]
-            self.initialSimTable[input_node] = input_string[1]
+            self.initialSimTable[input_node] = input_string[i]
             i += 1
 
     def _updateFault(self, newFault):
