@@ -96,17 +96,13 @@ def program3():
   coverage_series = []
 
   # Get fault list
-  fault_list = circuit.getFullFaultList()
-  print(f"Number of faults: {len(circuit.fault_list)}")
-  #print(circuit.fault_list)
-  circuit._wireEquivalenceCollapse()
-  print(f"Number of faults: {len(circuit.fault_list)}")
-  circuit._gateEquivalenceCollapse()
-  print(f"Number of faults: {len(circuit.fault_list)}")
-  #print(circuit.fault_list)
+  circuit.doFaultCollapse()
+  fault_list = circuit.fault_list
 
-  return
   simulator = sim.Simulation(circuit)
+  # load the updated fault list into the simulator
+  simulator._initFaults(fault_list)
+
   for i in range(0,10):
     # Generate a random test vector
     test_vector = generateBitVector(input_width)

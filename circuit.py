@@ -168,6 +168,9 @@ class Circuit(object):
         dropped_faults.append(node.name+'-0')
         dropped_faults.append(node.name+'-1')
 
+      # if i can't drop anything, return
+      if (len(dropped_faults) == 0):
+        return
       # keep the first fault of the equivalence class
       dropped_faults.pop(0)
       # remove the fault from the full fault list
@@ -175,7 +178,41 @@ class Circuit(object):
         if (dropped_fault in self.fault_list):
           self.fault_list.remove(dropped_fault)
       
+  def _gateDominanceCollapse(self):
+    for node in self.nodes.values():
+      dropped_fault = ""
 
+      if (node.function == __AND__):
+        # in AND gate i can drop the node-1 fault
+        # because it's dominated by its inputs
+        dropped_fault = node.name+'-1'
+      elif (node.function == __NAND__):
+        # in AND gate i can drop the node-1 fault
+        # because it's dominated by its inputs
+        dropped_fault = node.name+'-0'
+      elif (node.function == __OR__):
+        # in AND gate i can drop the node-1 fault
+        # because it's dominated by its inputs
+        dropped_fault = node.name+'-0'
+      elif (node.function == __NOR__):
+        # in AND gate i can drop the node-1 fault
+        # because it's dominated by its inputs
+        dropped_fault = node.name+'-1'
+
+      if (dropped_fault in self.fault_list):
+        self.fault_list.remove(dropped_fault)
+  
+  def doFaultCollapse(self):
+    # compute first the full fault list
+    self.getFullFaultList()
+    # apply the three methods for fault collapse
+    print(len(self.fault_list))
+    self._wireEquivalenceCollapse()
+    print(len(self.fault_list))
+    self._gateEquivalenceCollapse()
+    print(len(self.fault_list))
+    self._gateDominanceCollapse()
+    print(len(self.fault_list))
 
 class Node(object):
   def __init__(self, node_name):

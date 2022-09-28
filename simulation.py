@@ -1,5 +1,6 @@
 import time
 
+
 class Simulation(object):
 
     def __init__(self, circuit):
@@ -13,7 +14,6 @@ class Simulation(object):
         # Levelize the circuit to optimize simulation
         circuit.levelize()
         self._initialize()
-        self._initFaults()
 
     def simulate(self, faults=None):
         # Initialize the simulation table
@@ -24,13 +24,12 @@ class Simulation(object):
           self._faultSimulation(faults)
         else:  # start the simulation without fault
           self._normalSimulation()
-
-    def _initFaults(self):
-        full_fault_list = self.circuit.getFullFaultList()
-
-        for fault in full_fault_list:
-            self.faults[fault] = 0
     
+
+    def _initFaults(self, fault_list):
+        for fault in fault_list:
+            self.faults[fault] = 0
+
     def getFaultCoverage(self):
         # count the number of ones in the dictionary
         return int(list(self.faults.values()).count(1) / len(self.faults.keys()) * 100)
@@ -45,7 +44,7 @@ class Simulation(object):
     def _initialize(self):
         # reset the fault if any
         self.fault = {"node": "", "input": "", "fault": "", "type": 0}
-        
+
         for node_name in sorted(self.circuit.levels, key=self.circuit.levels.get):
           self.simTable[node_name] = 'X'
 
