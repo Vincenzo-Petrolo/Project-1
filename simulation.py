@@ -82,8 +82,13 @@ class Simulation(object):
 
     def _faultSimulation(self, fault_list):
       totalDetectedFaults = 0
+      skippedSims = 0
       # this for takes O(faults)
       for fault in fault_list:
+        # if fault was already detected, then skip simulation
+        if (self.faults[fault] == 1):
+            skippedSims += 1
+            continue
         # reset the simTable
         self._initialize()
         # reset the table to its original value
@@ -103,6 +108,7 @@ class Simulation(object):
       # eventually print the result of the fault simulation
       print(
           f"Total faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")
+      print(f"Total fault sims skipped: {skippedSims}")
 
     def _get_inputs(self, tv=None):
 

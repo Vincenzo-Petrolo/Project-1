@@ -206,13 +206,9 @@ class Circuit(object):
     # compute first the full fault list
     self.getFullFaultList()
     # apply the three methods for fault collapse
-    print(len(self.fault_list))
     self._wireEquivalenceCollapse()
-    print(len(self.fault_list))
     self._gateEquivalenceCollapse()
-    print(len(self.fault_list))
     self._gateDominanceCollapse()
-    print(len(self.fault_list))
 
 class Node(object):
   def __init__(self, node_name):
