@@ -1,4 +1,6 @@
-import time
+import os
+import threading
+import numpy as np
 
 
 class Simulation(object):
@@ -21,7 +23,22 @@ class Simulation(object):
 
         # check if i need to perform fault simulation or not
         if (faults is not None):
-          self._faultSimulation(faults)
+            # perform multi-threading fault simulation
+            cpu_count = os.cpu_count()
+            print(f"Spawning {cpu_count} threads")
+            # spawn cpu_count threads working on n parts of the fault list
+            fault_splits = np.array_split(faults, cpu_count)
+            threads_handles = []
+            for fault_list in fault_splits:
+                threads_handles.append(threading.Thread(target=self._faultSimulation, args=(list(fault_list),)))
+            # start the threads
+            for thread_handle in threads_handles:
+                thread_handle.start()
+            # now wait for the threads to join
+            for thread_handle in threads_handles:
+                thread_handle.join()
+
+            #self._faultSimulation(faults)
         else:  # start the simulation without fault
           self._normalSimulation()
     
