@@ -97,9 +97,14 @@ def program3():
 
   # Get fault list
   fault_list = circuit.getFullFaultList()
-  print(circuit.fault_list)
+  print(f"Number of faults: {len(circuit.fault_list)}")
+  #print(circuit.fault_list)
   circuit._wireEquivalenceCollapse()
-  print(circuit.fault_list)
+  print(f"Number of faults: {len(circuit.fault_list)}")
+  circuit._gateEquivalenceCollapse()
+  print(f"Number of faults: {len(circuit.fault_list)}")
+  #print(circuit.fault_list)
+
   return
   simulator = sim.Simulation(circuit)
   for i in range(0,10):

@@ -128,7 +128,6 @@ class Circuit(object):
   # this method applies wire equivalence on
   # nodes with no fanout
   def _wireEquivalenceCollapse(self):
-    print(f"Before: {len(self.fault_list)}")
     for node in self.nodes.values():
       # get the input list for the node
       node_inputs = node.getFanIn()
@@ -141,7 +140,41 @@ class Circuit(object):
           # now remove them from the list
           self.fault_list.remove(sa0_input)
           self.fault_list.remove(sa1_input)
-    print(f"After: {len(self.fault_list)}")
+
+  def _gateEquivalenceCollapse(self):
+    for node in self.nodes.values():
+      node_inputs = node.getFanIn()
+      dropped_faults = []
+      if (node.function == __AND__):
+        for node_input in node_inputs:
+          dropped_faults.append(node.name + '-' + node_input + '-0')
+        dropped_faults.append(node.name+'-0')
+      elif (node.function == __NAND__):
+        for node_input in node_inputs:
+          dropped_faults.append(node.name + '-' + node_input + '-0')
+        dropped_faults.append(node.name+'-1')
+      elif (node.function == __OR__):
+        for node_input in node_inputs:
+          dropped_faults.append(node.name + '-' + node_input + '-1')
+        dropped_faults.append(node.name+'-1')
+      elif (node.function == __NOR__):
+        for node_input in node_inputs:
+          dropped_faults.append(node.name + '-' + node_input + '-1')
+        dropped_faults.append(node.name+'-0')
+      elif (node.function == __NOT__):
+        dropped_faults.append(node.name+'-0')
+        dropped_faults.append(node.name+'-1')
+      elif (node.function == __BUF__):
+        dropped_faults.append(node.name+'-0')
+        dropped_faults.append(node.name+'-1')
+
+      # keep the first fault of the equivalence class
+      dropped_faults.pop(0)
+      # remove the fault from the full fault list
+      for dropped_fault in dropped_faults:
+        if (dropped_fault in self.fault_list):
+          self.fault_list.remove(dropped_fault)
+      
 
 
 class Node(object):
