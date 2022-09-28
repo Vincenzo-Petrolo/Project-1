@@ -40,6 +40,9 @@ def program1():
   os.system("clear")
   fault = input("Write a single stuck-at fault (e.g. g-c-1) : ")
   simulation._get_inputs()
+  fault_list = circuit.getFullFaultList()
+  # load the fault list into the simulation
+  simulation._initFaults(fault_list)
   simulation.simulate([fault])
   print(simulation.simTable)
   print(f"Fault detected: {simulation._isFaultDetected()}")
@@ -71,6 +74,9 @@ def program2():
   simulator = sim.Simulation(circuit)
   simulator._get_inputs()
 
+  fault_list = circuit.getFullFaultList()
+  # load the fault list into the simulation
+  simulator._initFaults(fault_list)
   simulator.simulate(fault_list)
   
       

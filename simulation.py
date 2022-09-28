@@ -74,6 +74,9 @@ class Simulation(object):
             self.simTable[node_name] = output
 
     def _normalSimulation(self):
+        # initialize the inputs
+        for initialInput in self.initialSimTable.keys():
+          self.simTable[initialInput] = self.initialSimTable[initialInput]
         # I use levelization based ordering to go through the loop once
         # for each level i could spawn threads to take care of each single gate
         while (self._goalIsReached() == False):
@@ -119,7 +122,6 @@ class Simulation(object):
         if (tv is None):
             formatted_string = "Write the input test vector " + inputs_names + "= "
             input_string = input(formatted_string)
-            input_string = input_string
         else:
             input_string = tv
 
