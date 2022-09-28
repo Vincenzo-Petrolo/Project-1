@@ -9,10 +9,14 @@ class Circuit(object):
     self.outputs = {}
     # Initialize an empty dictionary of nodes, useful for graph traversal
     self.nodes = {}
+    # this list will hold the fanout nodes
+    self.fanout_nodes = []
+    # this list is garbage, it holds inputs to nodes
+    # it is used for searching the already taken nodes
+    self.garbage = []
 
   def _addInput(self, input_node):
     self.inputs[input_node.name] = input_node
-
 
   def _addOutput(self, output_node):
     self.outputs[output_node.name] = output_node
@@ -23,6 +27,12 @@ class Circuit(object):
     elif isinstance(node, OutputNode):
       self._addOutput(node)
     else:
+      for input_name in node.getFanIn():
+        if (input_name in self.garbage):
+          # we flag it as fanout
+          self.fanout_nodes.append(input_name)
+        else:
+          self.garbage.append(input_name)
       self.nodes[node.getName()] = node
 
   def __str__(self):
@@ -35,12 +45,12 @@ class Circuit(object):
     for node in self.nodes.values():
       if isinstance(node, GateNode):
         nodes_string += str(node)
-    
+
     final_string = formatted_string + '\n' \
-                    + inputs_string + '\n' \
-                    + outputs_string + '\n'\
-                    + nodes_string
-    
+        + inputs_string + '\n' \
+        + outputs_string + '\n'\
+        + nodes_string
+
     return decorator + '\n' + final_string + '\n' + decorator
 
   def levelize(self):
@@ -53,7 +63,7 @@ class Circuit(object):
     # initialize the input level to 0
     for nodeName in self.inputs.keys():
       self.levels[nodeName] = 0
-    # until every gate is not assigned 
+    # until every gate is not assigned
     # with a valid level do the loop
     while finish is False:
       finish = True
@@ -73,21 +83,20 @@ class Circuit(object):
     max_level = max(self.levels.values())
     print("#"*30)
     print("Circuit levels")
-    for i in range(0,max_level+1):
-      node_names = [k for k,v in self.levels.items() if v == i]
+    for i in range(0, max_level+1):
+      node_names = [k for k, v in self.levels.items() if v == i]
       print(f"LEVEL({i}): {'[%s]' % ', '.join(map(str, node_names))}")
     print("#"*30)
 
-    
   def _computeLevel(self, inputs):
     # create an empty list of levels
     levels = []
 
     for input in inputs:
       levels.append(self.levels[input])
-    
+
     return max(levels) + 1
-  
+
   def _nodeIsValid(self, inputs):
     for input in inputs:
       if (self.levels[input] < 0):
@@ -95,38 +104,52 @@ class Circuit(object):
 
     return True
 
-    
-
   def getFullFaultList(self):
-    fault_list = []
-    
+    self.fault_list = []
+
     for gate_node in self.nodes.values():
       for fan_in in gate_node.getFanIn():
-        fault_list.append(f"{gate_node.name}-{fan_in}-0")
-        fault_list.append(f"{gate_node.name}-{fan_in}-1")
-        
-      fault_list.append(f"{gate_node.name}-0")
-      fault_list.append(f"{gate_node.name}-1")
+        self.fault_list.append(f"{gate_node.name}-{fan_in}-0")
+        self.fault_list.append(f"{gate_node.name}-{fan_in}-1")
 
+      self.fault_list.append(f"{gate_node.name}-0")
+      self.fault_list.append(f"{gate_node.name}-1")
 
     # now print the faults for the inputs
     for input_name in self.inputs:
-      fault_list.append(f"{input_name}-0")
-      fault_list.append(f"{input_name}-1")
+      self.fault_list.append(f"{input_name}-0")
+      self.fault_list.append(f"{input_name}-1")
     for output_name in self.outputs:
-      fault_list.append(f"{output_name}-0")
-      fault_list.append(f"{output_name}-1")
+      self.fault_list.append(f"{output_name}-0")
+      self.fault_list.append(f"{output_name}-1")
 
-    return fault_list
-    
-      
-    
+    return self.fault_list
+  
+  # this method applies wire equivalence on
+  # nodes with no fanout
+  def _wireEquivalenceCollapse(self):
+    print(f"Before: {len(self.fault_list)}")
+    for node in self.nodes.values():
+      # get the input list for the node
+      node_inputs = node.getFanIn()
+      for node_input in node_inputs:
+        if (node_input not in self.fanout_nodes):
+          # then i can apply fault equivalence
+          #i generate the faults i want to remove from the list
+          sa0_input = node_input + '-0'
+          sa1_input = node_input + '-1'
+          # now remove them from the list
+          self.fault_list.remove(sa0_input)
+          self.fault_list.remove(sa1_input)
+    print(f"After: {len(self.fault_list)}")
+
+
 class Node(object):
   def __init__(self, node_name):
     self.name = node_name
-    self.fan_in = [] # Inputs to the node
-    self.fan_out = [] # Outputs from the node
-    
+    self.fan_in = []  # Inputs to the node
+    self.fan_out = []  # Outputs from the node
+
   def getName(self):
     return self.name
 
@@ -142,8 +165,10 @@ class Node(object):
     return f"Simple node of name: {self.name}\nFan-in: {self.fan_in}\nFan-out: {self.fan_out}"
 
 # Input node class, inherits from Node
+
+
 class InputNode(Node):
-  def __init__(self, node_name, fan_out_nodes = []):
+  def __init__(self, node_name, fan_out_nodes=[]):
     super().__init__(node_name)
     # the input to an input node is the node itself
     self.fan_in.append(self)
@@ -155,19 +180,22 @@ class InputNode(Node):
     return f"Input node of name: {self.name}\nFan-in: {self.fan_in}\nFan-out: {self.fan_out}"
 
 # Output Node class, inherits from Node
+
+
 class OutputNode(Node):
-  def __init__(self, node_name, fan_in_nodes = []):
+  def __init__(self, node_name, fan_in_nodes=[]):
     super().__init__(node_name)
     # the output to an output node is the node itself
     self.fan_out.append(self)
 
     self.fan_in = fan_in_nodes
-  
+
   def __str__(self):
     return f"Output node of name: {self.name}\nFan-in: {self.fan_in}\nFan-out: {self.fan_out}"
 
+
 class GateNode(Node):
-  def __init__(self, node_name, fan_in_nodes = [], fan_out_nodes = [], gateFunctionality = None):
+  def __init__(self, node_name, fan_in_nodes=[], fan_out_nodes=[], gateFunctionality=None):
     super().__init__(node_name)
 
     self.fan_in = fan_in_nodes
@@ -182,9 +210,8 @@ class GateNode(Node):
 
   def __str__(self):
     return f"\nGate node of name: {self.name}\n" \
-    f"Function: {len(self.fan_in)}-{len(self.fan_out)} {self.function.__name__.strip('_')}\n" \
-    f"Fan-in: {self.fan_in}\nFan-out: {self.fan_out}\n"
-
+        f"Function: {len(self.fan_in)}-{len(self.fan_out)} {self.function.__name__.strip('_')}\n" \
+        f"Fan-in: {self.fan_in}\nFan-out: {self.fan_out}\n"
 
 
 # Those functions implement the D-algebra operations
@@ -210,6 +237,7 @@ def __AND__(inputs_list):
 
   return '1'
 
+
 def __NAND__(inputs_list):
   if ('0' in inputs_list):
     return '1'
@@ -225,8 +253,9 @@ def __NAND__(inputs_list):
   if ('D' in inputs_list):
     return 'D'
   elif ("D'" in inputs_list):
-    return "D'"  
+    return "D'"
   return '0'
+
 
 def __OR__(inputs_list):
   if ('1' in inputs_list):
@@ -244,8 +273,9 @@ def __OR__(inputs_list):
     return 'D'
   elif ("D'" in inputs_list):
     return "D'"
-    
+
   return '0'
+
 
 def __NOR__(inputs_list):
   if ('1' in inputs_list):
@@ -263,13 +293,14 @@ def __NOR__(inputs_list):
     return 'D'
   elif ("D'" in inputs_list):
     return "D'"
-    
+
   return '1'
+
 
 def __XOR__(inputs_list):
   if ('X' in inputs_list):
     return 'X'
-  if  ('U' in inputs_list):
+  if ('U' in inputs_list):
     return 'U'
   number_ones = inputs_list.count('1')
 
@@ -302,19 +333,20 @@ def __XOR__(inputs_list):
       return "D'"
     else:
       return '0'
-    
+
   else:
-    # continue with normal simulatio  
+    # continue with normal simulatio
     # if the number of ones is even
     if (number_ones % 2 == 0):
       return '0'
     # if the number of ones is odd
     return '1'
-  
+
+
 def __XNOR__(inputs_list):
   if ('X' in inputs_list):
     return 'X'
-  if  ('U' in inputs_list):
+  if ('U' in inputs_list):
     return 'U'
   number_ones = inputs_list.count('1')
 
@@ -346,15 +378,16 @@ def __XNOR__(inputs_list):
       return "D'"
     else:
       return '0'
-    
+
   else:
-    # continue with normal simulatio  
+    # continue with normal simulatio
     # if the number of ones is even
     if (number_ones % 2 == 0):
       return '1'
     # if the number of ones is odd
     return '0'
-    
+
+
 def __NOT__(inputs_list):
   if ('X' in inputs_list):
     return 'X'
@@ -365,11 +398,12 @@ def __NOT__(inputs_list):
     return "D'"
   elif ("D'" in inputs_list):
     return "D"
-  
+
   if ('0' in inputs_list):
     return '1'
 
   return '0'
+
 
 def __BUF__(inputs_list):
   return inputs_list[0]

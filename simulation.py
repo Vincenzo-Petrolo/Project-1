@@ -1,3 +1,5 @@
+import time
+
 class Simulation(object):
 
     def __init__(self, circuit):
@@ -8,6 +10,8 @@ class Simulation(object):
         self.initialSimTable = {}
         # store inside this dictionary the fault, and 0 or 1 if it is detected or not
         self.faults = {}
+        # Levelize the circuit to optimize simulation
+        circuit.levelize()
         self._initialize()
         self._initFaults()
 
@@ -41,8 +45,9 @@ class Simulation(object):
     def _initialize(self):
         # reset the fault if any
         self.fault = {"node": "", "input": "", "fault": "", "type": 0}
-        for node in self.circuit.nodes.values():
-          self.simTable[node.name] = 'X'
+        
+        for node_name in sorted(self.circuit.levels, key=self.circuit.levels.get):
+          self.simTable[node_name] = 'X'
 
     def _compute(self, node_name):
         # Avoid computing already computed gates
@@ -70,30 +75,33 @@ class Simulation(object):
             self.simTable[node_name] = output
 
     def _normalSimulation(self):
-      while (self._goalIsReached() == False):
-        for node in self.simTable:
-          self._compute(node)
+        # I use levelization based ordering to go through the loop once
+        # for each level i could spawn threads to take care of each single gate
+        while (self._goalIsReached() == False):
+            for node in self.simTable:
+                self._compute(node)
 
     def _faultSimulation(self, fault_list):
       totalDetectedFaults = 0
+      # this for takes O(faults)
       for fault in fault_list:
         # reset the simTable
         self._initialize()
         # reset the table to its original value
+        # this for takes O(number_inputs) time
         for initialInput in self.initialSimTable.keys():
           self.simTable[initialInput] = self.initialSimTable[initialInput]
-        # update the fault dictionary
+        # update the fault data structure with the new fault
         if (self._updateFault(fault) == False):
             print("Bad fault insertion, aborting simulation")
             return
-        # now start the simulation
-        while (self._goalIsReached() == False):
-            for node in self.simTable:
-              self._compute(node)
-        # print(f"{self.simTable} for {fault}")
+        # Start the simulation
+        self._normalSimulation()
+        # increase the counter
         if (self._isFaultDetected()):
             self.faults[fault] = 1
             totalDetectedFaults += 1
+      # eventually print the result of the fault simulation
       print(
           f"Total faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")
 
