@@ -52,6 +52,11 @@ class Circuit(object):
         + nodes_string +'\n'
     
     return final_string
+  
+  def displayFaultList(self, fault_list):
+    print(f"Fault list")
+    for fault in fault_list:
+      print(f"|\t{fault}\t|")
 
 
   def levelize(self):

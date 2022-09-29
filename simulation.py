@@ -122,12 +122,17 @@ class Simulation(object):
         self._normalSimulation()
         # increase the counter
         if (self._isFaultDetected()):
+            self._showDetectedFault(fault)
             self.faults[fault] = 1
             totalDetectedFaults += 1
       # eventually print the result of the fault simulation
       print(
           f"Total faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")
       print(f"Total fault sims skipped: {skippedSims}")
+    
+    def _showDetectedFault(self,fault):
+        print(f"|\t{fault}\t| Detected by {self.input_string}")
+
 
     def _get_inputs(self, tv=None):
 
@@ -140,7 +145,8 @@ class Simulation(object):
             input_string = input(formatted_string)
         else:
             input_string = tv
-
+        # store for printing purposes
+        self.input_string = input_string
         i = 0
         for input_node in self.circuit.inputs:
             self.simTable[input_node] = input_string[i]

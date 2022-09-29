@@ -60,10 +60,9 @@ def program1():
   
 # Single TV - All faults
 def program2():
-  print("Program 2 starting...")
   # Clear the screen from previous output
   os.system("clear")
-  print("Single TV - Single Fault program")
+  print("Program 2 starting")
   # Create the parser object
   parser = p.Parser()
   # Ask the user for the filename
@@ -74,19 +73,25 @@ def program2():
     filename = "circ.bench"
   # Now load the file into the circuit data structure
   circuit = parser.readFile(filename)
+  # get the full fault list for the circuit
   fault_list = circuit.getFullFaultList()
-  print(fault_list)
-  print(f"Total number of faults: {len(fault_list)}")
+  # display the full fault list
+  circuit.displayFaultList(fault_list)
+  # Print the total number of faults
+  print(f"\n#Faults\t=\t{len(fault_list)}\n")
   
   input("Press Enter to enter the perform fault coverage...")
   os.system("clear")
 
   simulator = sim.Simulation(circuit)
   simulator._get_inputs()
-
+  os.system("clear")
+  # get the fault list
   fault_list = circuit.getFullFaultList()
   # load the fault list into the simulation
   simulator._initFaults(fault_list)
+  print(f"Starting fault simulation, detected faults will be printed as they are discovered...\n")
+  # perform the fault simulation
   simulator.simulate(fault_list)
   
       
