@@ -138,10 +138,16 @@ def program3():
   
   # After generate the plot
   generatePlot(10, coverage_series)
+
+  input("Press Enter if you want to get the mean and variance")
+  os.system("clear")
+
+  iterations = input("Number of iterations: ")
+  os.system("clear")
   
   # this is a time consuming operation, so perform it over small circuits
   # perform 10 times the same thing as above, and get mean and variance and display it
-  advancedComputations(simulator, fault_list, input_width, 10)
+  advancedComputations(simulator, fault_list, input_width, int(iterations))
   
 
 def generateBitVector(length):
