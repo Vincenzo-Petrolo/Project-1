@@ -97,10 +97,9 @@ def program2():
       
 # Fault coverage of 1-10 TVs
 def program3():
-  print("Program 3 starting...")
   # Clear the screen from previous output
   os.system("clear")
-  print("Single TV - Single Fault program")
+  print("Program 3 starting")
   # Create the parser object
   parser = p.Parser()
   # Ask the user for the filename
@@ -116,7 +115,8 @@ def program3():
   # Create a dictionary to store coverage for each TV
   coverage_series = []
 
-  # Get fault list
+  # do fault collapse and get the fault list
+  # this will decrease the simulation time
   circuit.doFaultCollapse()
   fault_list = circuit.fault_list
 
@@ -124,6 +124,7 @@ def program3():
   # load the updated fault list into the simulator
   simulator._initFaults(fault_list)
 
+  # perform 10 simulations
   for i in range(0,10):
     # Generate a random test vector
     test_vector = generateBitVector(input_width)
@@ -137,6 +138,9 @@ def program3():
   # After generate the plot
   generatePlot(10, coverage_series)
   
+  # this is a time consuming operation, so perform it over small circuits
+  # perform 10 times the same thing as above, and get mean and variance and display it
+  advancedComputations(simulator, fault_list, input_width, 10)
   
 
 def generateBitVector(length):
@@ -158,3 +162,67 @@ def generatePlot(series_length, series):
   plt.ylabel('Fault coverage (%)')
     
   plt.savefig("fault_coverage_plot.jpg")
+
+def generateManyPlot(series_of_coverage_series, mean_series):
+  plt.close()
+
+  x = range(1, 11)
+  for series in series_of_coverage_series:
+    # plotting the points 
+    plt.plot(x, series)
+  
+    
+  # naming the x axis
+  plt.xlabel('Number of test vectors')
+  # naming the y axis
+  plt.ylabel('Fault coverage (%)')
+    
+  plt.savefig("advanced_series.jpg")
+
+  plt.close()
+
+  plt.plot(x, mean_series)
+
+  # naming the x axis
+  plt.xlabel('Number of test vectors')
+  # naming the y axis
+  plt.ylabel('Fault coverage (%)')
+    
+  plt.savefig("mean.jpg")
+
+
+def average(input_list):
+  return sum(input_list)/len(input_list)
+
+def advancedComputations(simulator, fault_list, input_width, iterations):
+  series_of_coverage_series = []
+
+  for j in range(0,iterations):
+    coverage_series = []
+    # re init the fault list
+    simulator._initFaults(fault_list)
+    # perform 10 simulations
+    for i in range(0,10):
+      # Generate a random test vector
+      test_vector = generateBitVector(input_width)
+      # provide it to the simulator
+      simulator._get_inputs(test_vector)
+      # perform the simulation on the fault list
+      simulator.simulate(fault_list)
+      # get the fault coverage
+      coverage_series.append(simulator.getFaultCoverage())
+    series_of_coverage_series.append(coverage_series)
+  
+  # at the end, plot them and get the mean coverage
+  mean_coverage_series = []
+  for i in range(0,10):
+    values_from_series = []
+    for coverage_series in series_of_coverage_series:
+      # append the value from the series
+      values_from_series.append(coverage_series[i])
+    mean_coverage_series.append(average(values_from_series))
+
+  generateManyPlot(series_of_coverage_series, mean_coverage_series) 
+      
+
+  
