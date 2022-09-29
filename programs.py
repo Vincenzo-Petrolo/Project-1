@@ -3,6 +3,7 @@ import parser as p
 import simulation as sim
 import random
 import matplotlib.pyplot as plt
+import statistics
 
 # Single TV - Single Fault program
 def program1():
@@ -163,7 +164,8 @@ def generatePlot(series_length, series):
     
   plt.savefig("fault_coverage_plot.jpg")
 
-def generateManyPlot(series_of_coverage_series, mean_series):
+def generateManyPlot(series_of_coverage_series, mean_series, variance_series):
+  # generate the plot for many series
   plt.close()
 
   x = range(1, 11)
@@ -176,19 +178,49 @@ def generateManyPlot(series_of_coverage_series, mean_series):
   plt.xlabel('Number of test vectors')
   # naming the y axis
   plt.ylabel('Fault coverage (%)')
+  plt.title("Fault coverage saturation for random test vectors")
     
   plt.savefig("advanced_series.jpg")
 
   plt.close()
 
+  # generate the plot for the mean series
   plt.plot(x, mean_series)
 
   # naming the x axis
   plt.xlabel('Number of test vectors')
   # naming the y axis
   plt.ylabel('Fault coverage (%)')
+  plt.title("Mean fault coverage saturation")
     
   plt.savefig("mean.jpg")
+
+  # generate the plot for the variance
+  plt.close()
+  plt.plot(x, variance_series)
+
+  # naming the x axis
+  plt.xlabel('Number of test vectors')
+  # naming the y axis
+  plt.ylabel('Fault coverage (%)')
+  plt.title("Variance of fault coverage saturation at each step between the series")
+    
+  plt.savefig("variance.jpg")
+
+  # generate the plot for the variance & mean
+  plt.close()
+  plt.plot(x, variance_series)
+  plt.plot(x, mean_series)
+
+  # naming the x axis
+  plt.xlabel('Number of test vectors')
+  # naming the y axis
+  plt.ylabel('Fault coverage (%)')
+  plt.title("Variance and mean of the fault coverage saturation effect")
+    
+  plt.savefig("variance_and_mean.jpg")
+
+
 
 
 def average(input_list):
@@ -215,14 +247,13 @@ def advancedComputations(simulator, fault_list, input_width, iterations):
   
   # at the end, plot them and get the mean coverage
   mean_coverage_series = []
+  variance_coverage_series = []
   for i in range(0,10):
     values_from_series = []
     for coverage_series in series_of_coverage_series:
       # append the value from the series
       values_from_series.append(coverage_series[i])
     mean_coverage_series.append(average(values_from_series))
+    variance_coverage_series.append(statistics.variance(values_from_series))
 
-  generateManyPlot(series_of_coverage_series, mean_coverage_series) 
-      
-
-  
+  generateManyPlot(series_of_coverage_series, mean_coverage_series, variance_coverage_series) 
