@@ -36,11 +36,11 @@ class Circuit(object):
       self.nodes[node.getName()] = node
 
   def __str__(self):
-    decorator = "================================"
-    formatted_string = f"Circuit name: {self.name}"
-    inputs_string = f"Inputs: {sorted(self.inputs.keys())}"
-    outputs_string = f"Outputs: {sorted(self.outputs.keys())}"
-    nodes_string = "Nodes list:\n"
+    formatted_string =  f"|\tCircuit\t|\t{self.name}"
+    inputs_string =     f"|\tIn     \t|\t{sorted(self.inputs.keys())}"
+    outputs_string =    f"|\tOut    \t|\t{sorted(self.outputs.keys())}"
+    nodes_string =       "----------------Nodes-----------------\n"
+
 
     for node in self.nodes.values():
       if isinstance(node, GateNode):
@@ -49,9 +49,10 @@ class Circuit(object):
     final_string = formatted_string + '\n' \
         + inputs_string + '\n' \
         + outputs_string + '\n'\
-        + nodes_string
+        + nodes_string +'\n'
+    
+    return final_string
 
-    return decorator + '\n' + final_string + '\n' + decorator
 
   def levelize(self):
     finish = False
@@ -243,7 +244,10 @@ class InputNode(Node):
     self.fan_out = fan_out_nodes
 
   def __str__(self):
-    return f"Input node of name: {self.name}\nFan-in: {self.fan_in}\nFan-out: {self.fan_out}"
+    output_string =     "|\tName\t|\tFan-in\t|\tFan-out\t|\tType\t|\n"
+    output_string +=    "|\t----\t|\t------\t|\t-------\t|\t----\t|\n"
+    output_string +=    f"|\t{self.name}\t|\t{self.fan_in}\t|\t{self.fan_out}\t|\tIn\t|"
+    return output_string
 
 # Output Node class, inherits from Node
 
@@ -257,7 +261,10 @@ class OutputNode(Node):
     self.fan_in = fan_in_nodes
 
   def __str__(self):
-    return f"Output node of name: {self.name}\nFan-in: {self.fan_in}\nFan-out: {self.fan_out}"
+    output_string =     "|\tName\t|\tFan-in\t|\tFan-out\t|\tType\t|\n"
+    output_string +=    "|\t----\t|\t------\t|\t-------\t|\t----\t|\n"
+    output_string +=    f"|\t{self.name}\t|\t{self.fan_in}\t|\t{self.fan_out}\t|\tOut\t|"
+    return output_string
 
 
 class GateNode(Node):
@@ -275,9 +282,13 @@ class GateNode(Node):
     return None
 
   def __str__(self):
-    return f"\nGate node of name: {self.name}\n" \
-        f"Function: {len(self.fan_in)}-{len(self.fan_out)} {self.function.__name__.strip('_')}\n" \
-        f"Fan-in: {self.fan_in}\nFan-out: {self.fan_out}\n"
+    output_string = f"|\t{self.name}\t|\t{self.function.__name__.strip('_')}("
+    for fan_in in self.fan_in:
+      output_string += f"{fan_in},"
+    # replace the last comma with a parenthesis
+    output_string = output_string[:-1]
+    output_string += ")\n"
+    return output_string
 
 
 # Those functions implement the D-algebra operations

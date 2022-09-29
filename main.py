@@ -1,6 +1,7 @@
 # Project 1 main
 
 from programs import program1,program2,program3
+import os
 
 def main():  
   #menu description
@@ -14,19 +15,20 @@ def main():
   
   # Show the menu
   while (choice not in [1,2,3]):
+    os.system("clear")
     print(menu)
     choice = int(input("Write the number of the program you want to execute: "))
     
   # Once the user makes a choice, run the specific program
   if (choice == 1):
     program1()
-    return;
+    return
   elif (choice == 2):
     program2()
-    return;
+    return
   elif (choice == 3):
     program3()
-    return;
+    return
   else:
     print("Error on the choice, returning")
     return

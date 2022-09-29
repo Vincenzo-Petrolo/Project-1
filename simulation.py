@@ -18,12 +18,33 @@ class Simulation(object):
     def simulate(self, faults=None):
         # Initialize the simulation table
         self._initialize()
+        # reset the table to its original value, this is used if
+        # running many simulations without getting new inputs
+        for initialInput in self.initialSimTable.keys():
+          self.simTable[initialInput] = self.initialSimTable[initialInput]
 
         # check if i need to perform fault simulation or not
         if (faults is not None):
           self._faultSimulation(faults)
         else:  # start the simulation without fault
           self._normalSimulation()
+    
+    def printOutputs(self):
+        output_string =     "|\tOutput\t|\tValue\t|\n"
+        output_string +=    "|\t------\t|\t-----\t|\n"
+        for output_name in self.outputs:
+            output_string += "|\t"+output_name+"\t|\t"+self.simTable[output_name]+"\t|\n"
+        
+        print(output_string)
+    
+    def showInternalAndOutputNodes(self):
+        output_string =     "|\tNode\t|\tValue\t|\n"
+        output_string +=    "|\t----\t|\t-----\t|\n"
+        for node_name in self.simTable:
+            if (node_name not in self.inputs):
+                output_string += "|\t"+node_name + "\t|\t"+ self.simTable[node_name] +"\t|\n"
+        
+        print(output_string)
     
 
     def _initFaults(self, fault_list):
@@ -74,9 +95,6 @@ class Simulation(object):
             self.simTable[node_name] = output
 
     def _normalSimulation(self):
-        # initialize the inputs
-        for initialInput in self.initialSimTable.keys():
-          self.simTable[initialInput] = self.initialSimTable[initialInput]
         # I use levelization based ordering to go through the loop once
         # for each level i could spawn threads to take care of each single gate
         while (self._goalIsReached() == False):
@@ -94,8 +112,6 @@ class Simulation(object):
             continue
         # reset the simTable
         self._initialize()
-        # reset the table to its original value
-        # this for takes O(number_inputs) time
         for initialInput in self.initialSimTable.keys():
           self.simTable[initialInput] = self.initialSimTable[initialInput]
         # update the fault data structure with the new fault

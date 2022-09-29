@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def program1():
   # Clear the screen from previous output
   os.system("clear")
-  print("Single TV - Single Fault program")
+  print("Program 1 starting")
   # Create the parser object
   parser = p.Parser()
   # Ask the user for the filename
@@ -20,32 +20,42 @@ def program1():
   # Now load the file into the circuit data structure
   circuit = parser.readFile(filename)
   # Print informations about the circuit
-  print(f"Circuit {filename}:")
-  print(f"Input vector size: {len(circuit.inputs)}")
-  print(f"Output vector size: {len(circuit.outputs)}")
- 
+  print(f"|\tInput vector size \t|\t{len(circuit.inputs)}")
+  print(f"|\tOutput vector size\t|\t{len(circuit.outputs)}")
   # Show more detailed informations
-  input("Press Enter to continue and show detailed description of the circuit...")
+  input("\nPress Enter to continue and show detailed analysis of the circuit...")
   os.system("clear")
   print(circuit)
+  #=====================================================================
+
   # Simulate the circuit given 1 input test vector
   input("Press Enter to enter the simulation phase...")
   os.system("clear")
+
   simulation = sim.Simulation(circuit)
+  # read the inputs to the circuit
   simulation._get_inputs()
+  # perform the simulation
   simulation.simulate()
-  print(simulation.simTable)
+  # print the simulation result
+  simulation.printOutputs()
+  #=====================================================================
   # Perform fault simulation
   input("Press Enter to enter the fault simulation phase...")
   os.system("clear")
+
   fault = input("Write a single stuck-at fault (e.g. g-c-1) : ")
-  simulation._get_inputs()
+  # get the full fault list, needed for the fault simulation
   fault_list = circuit.getFullFaultList()
   # load the fault list into the simulation
   simulation._initFaults(fault_list)
+  # perform the simulation using the fault list and the same test vector
   simulation.simulate([fault])
-  print(simulation.simTable)
+  # Show the internal state
+  simulation.showInternalAndOutputNodes()
+  # Show if fault is detected
   print(f"Fault detected: {simulation._isFaultDetected()}")
+  #=====================================================================
   
   
 # Single TV - All faults
