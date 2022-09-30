@@ -16,7 +16,7 @@ class Simulation(object):
         self._initialize()
         self.fault_detected = False
 
-    def simulate(self, faults=None):
+    def simulate(self, faults=None, tune = False):
         # Initialize the simulation table
         self._initialize()
         # reset the table to its original value, this is used if
@@ -26,7 +26,7 @@ class Simulation(object):
 
         # check if i need to perform fault simulation or not
         if (faults is not None):
-          self._faultSimulation(faults)
+          self._faultSimulation(faults, tune)
         else:  # start the simulation without fault
           self._normalSimulation()
     
@@ -132,9 +132,8 @@ class Simulation(object):
         # if none of above triggers, then the fault was correctly activated 
         return True
 
-    def _faultSimulation(self, fault_list):
+    def _faultSimulation(self, fault_list, tune = False):
       totalDetectedFaults = 0
-      skippedSims = 0
       # this for takes O(faults)
       for fault in fault_list:
         # reset the fault detected flag
@@ -142,7 +141,6 @@ class Simulation(object):
         self.fault_activated = True
         # if fault was already detected, then skip simulation
         if (self.faults[fault] == 1):
-            skippedSims += 1
             continue
         # reset the simTable
         self._initialize()
@@ -154,16 +152,20 @@ class Simulation(object):
             return
         # Start the simulation
         self.fault_activated = self._activate()
+        if (tune == True and self.fault_activated == False):
+            # skip and avoid propagation
+            continue
         # now propagate
         self._normalSimulation()
         # increase the counter
         if (self._isFaultDetected() and self.fault_activated):
             self.fault_detected = True
-            self._showDetectedFault(fault)
+            if (tune != True):
+                self._showDetectedFault(fault)
             self.faults[fault] = 1
             totalDetectedFaults += 1
       # eventually print the result of the fault simulation
-      print(f"Total faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")
+      print(f"Total new faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")
     
     def _showDetectedFault(self,fault):
         print(f"|\t{fault}\t| Detected by {self.input_string}")

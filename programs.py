@@ -131,6 +131,8 @@ def program3():
   simulator = sim.Simulation(circuit)
   # load the updated fault list into the simulator
   simulator._initFaults(fault_list)
+  print(f"Starting simulation on {len(fault_list)} faults")
+  print(f"The program will execute {len(fault_list)*10} simulations, it could take a while...")
 
   # perform 10 simulations
   for i in range(0,10):
@@ -139,17 +141,17 @@ def program3():
     # provide it to the simulator
     simulator._get_inputs(test_vector)
     # perform the simulation on the fault list
-    simulator.simulate(fault_list)
+    simulator.simulate(fault_list, tune=True)
     # get the fault coverage
     coverage_series.append(simulator.getFaultCoverage())
   
   # After generate the plot
   generatePlot(10, coverage_series)
 
-  input("Press Enter if you want to get the mean and variance")
+  input("Press Enter if you want to get the mean and variance...")
   os.system("clear")
 
-  iterations = input("Number of iterations: ")
+  iterations = input("Number of iterations [time consuming operation, be careful!]: ")
   os.system("clear")
   
   # this is a time consuming operation, so perform it over small circuits
@@ -253,7 +255,7 @@ def advancedComputations(simulator, fault_list, input_width, iterations):
       # provide it to the simulator
       simulator._get_inputs(test_vector)
       # perform the simulation on the fault list
-      simulator.simulate(fault_list)
+      simulator.simulate(fault_list, tune=True)
       # get the fault coverage
       coverage_series.append(simulator.getFaultCoverage())
     series_of_coverage_series.append(coverage_series)
