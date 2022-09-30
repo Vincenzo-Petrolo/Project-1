@@ -96,14 +96,8 @@ class Simulation(object):
                 self._compute(node)
     
     def _faultIsReached(self):
-        if (self.fault["type"] == 1):
-            # then i just need to check if the value is computed
-            if (self.simTable[self.fault["node"]] != 'X'):
-                return True
-        elif (self.fault["type"] == 2):
-            # then i just need to check if the value is computed
-            if (self.simTable[self.fault["node"]] != 'X'):
-                return True
+        if (self.simTable[self.fault["node"]] != 'X'):
+            return True
         return False
 
     def _activate(self):
@@ -113,16 +107,16 @@ class Simulation(object):
         # when i finish, it means i computed the faulty node
         # now i need to check if i activate works
         if (self.fault["type"] == 1):
-            if (self.fault["fault"] == 'D' and self.simTable[self.fault["node"]] == '0'):
+            if (self.fault["fault"] == 'D' and self.simTable[self.fault["node"]] in ['0','U']):
                 return False
-            elif (self.fault["fault"] == "D'" and self.simTable[self.fault["node"]] == '1'):
+            elif (self.fault["fault"] == "D'" and self.simTable[self.fault["node"]] in ['1','U']):
                 return False
             # if i observe a difference in the node then update the simTable
             self.simTable[self.fault["node"]] = self.fault["fault"]
         elif (self.fault["type"] == 2):
-            if (self.fault["fault"] == 'D' and self.simTable[self.fault["input"]] == '0'):
+            if (self.fault["fault"] == 'D' and self.simTable[self.fault["input"]] in ['0','U'] ):
                 return False
-            elif (self.fault["fault"] == "D'" and self.simTable[self.fault["input"]] == '1'):
+            elif (self.fault["fault"] == "D'" and self.simTable[self.fault["input"]] in ['1','U']):
                 return False
             # if i observe a difference in the node then update the simTable
             node = self.circuit.nodes[self.fault["node"]]
@@ -160,9 +154,8 @@ class Simulation(object):
             return
         # Start the simulation
         self.fault_activated = self._activate()
-        if (self.fault_activated):
-            # now propagate
-            self._normalSimulation()
+        # now propagate
+        self._normalSimulation()
         # increase the counter
         if (self._isFaultDetected() and self.fault_activated):
             self.fault_detected = True
