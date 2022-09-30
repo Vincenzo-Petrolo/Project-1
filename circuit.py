@@ -333,9 +333,9 @@ def __NAND__(inputs_list):
     return '0'
   # At this point I have all 1s or a D/D'
   if ('D' in inputs_list):
-    return 'D'
-  elif ("D'" in inputs_list):
     return "D'"
+  elif ("D'" in inputs_list):
+    return "D"
   return '0'
 
 
@@ -372,9 +372,9 @@ def __NOR__(inputs_list):
     return '0'
     # At this point I have all 1s or a D/D'
   if ('D' in inputs_list):
-    return 'D'
-  elif ("D'" in inputs_list):
     return "D'"
+  elif ("D'" in inputs_list):
+    return "D"
 
   return '1'
 
@@ -455,7 +455,7 @@ def __XNOR__(inputs_list):
     if (good_result == '1' and bad_result == '1'):
       return '1'
     elif (good_result == '1' and bad_result == '0'):
-      return 'D'
+      return "D"
     elif (good_result == '0' and bad_result == '1'):
       return "D'"
     else:

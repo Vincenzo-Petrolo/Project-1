@@ -55,7 +55,14 @@ def program1():
   # Show the internal state
   simulation.showInternalAndOutputNodes()
   # Show if fault is detected
-  print(f"Fault detected: {simulation._isFaultDetected()}")
+  if (simulation.fault_activated == False):
+    print(f"Fault is not activated => No difference shown at output")
+    return
+  elif (simulation.fault_detected == False):
+    print(f"Fault could not be propagated") 
+    return
+  else:
+    print(f"Fault detected!")
   #=====================================================================
   
   

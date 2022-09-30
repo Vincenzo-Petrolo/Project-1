@@ -14,6 +14,7 @@ class Simulation(object):
         # Levelize the circuit to optimize simulation
         circuit.levelize()
         self._initialize()
+        self.fault_detected = False
 
     def simulate(self, faults=None):
         # Initialize the simulation table
@@ -78,21 +79,15 @@ class Simulation(object):
         inputs_names = node.getFanIn().copy()
         inputs = []
 
-        if (node_name == self.fault["node"]):
-            inputs_names.remove(self.fault["input"])
-            for i in inputs_names:
-                inputs.append(self.simTable[i])
+        for i in inputs_names:
+            inputs.append(self.simTable[i])
 
-            inputs.append(self.fault["fault"])
-            output = node.function(inputs)
-            self.simTable[node_name] = output
-        else:
-            for i in inputs_names:
-                inputs.append(self.simTable[i])
-
-            output = node.function(inputs)
-            # Now update the table
-            self.simTable[node_name] = output
+        output = node.function(inputs)
+        # Now update the table
+        self.simTable[node_name] = output
+    
+    def _canActivate(self, fault):
+        return self.fault_activated 
 
     def _normalSimulation(self):
         # I use levelization based ordering to go through the loop once
@@ -100,12 +95,59 @@ class Simulation(object):
         while (self._goalIsReached() == False):
             for node in self.simTable:
                 self._compute(node)
+    
+    def _faultIsReached(self):
+        if (self.fault["type"] == 1):
+            # then i just need to check if the value is computed
+            if (self.simTable[self.fault["node"]] != 'X'):
+                return True
+        elif (self.fault["type"] == 2):
+            # then i just need to check if the value is computed
+            if (self.simTable[self.fault["node"]] != 'X'):
+                return True
+        return False
+
+    def _activate(self):
+        while (self._faultIsReached() == False):
+            for node in self.simTable:
+                self._compute(node)        
+        # when i finish, it means i computed the faulty node
+        # now i need to check if i activate works
+        if (self.fault["type"] == 1):
+            if (self.fault["fault"] == 'D' and self.simTable[self.fault["node"]] == '0'):
+                return False
+            elif (self.fault["fault"] == "D'" and self.simTable[self.fault["node"]] == '1'):
+                return False
+            # i can update the simTable with the fault
+            self.simTable[self.fault["node"]] = self.fault["fault"]
+        elif (self.fault["type"] == 2):
+            if (self.fault["fault"] == 'D' and self.simTable[self.fault["input"]] == '0'):
+                return False
+            elif (self.fault["fault"] == "D'" and self.simTable[self.fault["input"]] == '1'):
+                return False
+            # now i can update the simTable with the fault but I need to be careful
+            # i will compute the propagation of the fault to simplify the code
+            node = self.circuit.nodes[self.fault["node"]]
+            inputs_names = node.getFanIn().copy()
+            inputs = []
+            inputs_names.remove(self.fault["input"])
+            for i in inputs_names:
+                inputs.append(self.simTable[i])
+
+            inputs.append(self.fault["fault"])
+            output = node.function(inputs)
+            self.simTable[self.fault["node"]] = output
+        # if none of above triggers, then the fault was correctly activated 
+        return True
 
     def _faultSimulation(self, fault_list):
       totalDetectedFaults = 0
       skippedSims = 0
       # this for takes O(faults)
       for fault in fault_list:
+        # reset the fault detected flag
+        self.fault_detected = False
+        self.fault_activated = True
         # if fault was already detected, then skip simulation
         if (self.faults[fault] == 1):
             skippedSims += 1
@@ -119,16 +161,18 @@ class Simulation(object):
             print("Bad fault insertion, aborting simulation")
             return
         # Start the simulation
-        self._normalSimulation()
+        self.fault_activated = self._activate()
+        if (self.fault_activated):
+            # now propagate
+            self._normalSimulation()
         # increase the counter
-        if (self._isFaultDetected()):
+        if (self._isFaultDetected() and self.fault_activated):
+            self.fault_detected = True
             self._showDetectedFault(fault)
             self.faults[fault] = 1
             totalDetectedFaults += 1
       # eventually print the result of the fault simulation
-      print(
-          f"Total faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")
-      print(f"Total fault sims skipped: {skippedSims}")
+      print(f"Total faults detected: {totalDetectedFaults} ({int(totalDetectedFaults/len(fault_list) * 100)}%)")
     
     def _showDetectedFault(self,fault):
         print(f"|\t{fault}\t| Detected by {self.input_string}")
@@ -172,7 +216,6 @@ class Simulation(object):
                 "fault": 'D' if (fault[1] == '0') else "D'",
                 "type": fault_type
             }
-            self.simTable[self.fault["node"]] = self.fault["fault"]
             return True
         else:
             # Now validate the fault
