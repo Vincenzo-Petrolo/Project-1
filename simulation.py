@@ -81,7 +81,6 @@ class Simulation(object):
 
         for i in inputs_names:
             inputs.append(self.simTable[i])
-
         output = node.function(inputs)
         # Now update the table
         self.simTable[node_name] = output
@@ -108,8 +107,8 @@ class Simulation(object):
         return False
 
     def _activate(self):
-        while (self._faultIsReached() == False):
-            for node in self.simTable:
+        for node in self.simTable:
+            if(self._faultIsReached() == False):
                 self._compute(node)        
         # when i finish, it means i computed the faulty node
         # now i need to check if i activate works
@@ -118,15 +117,14 @@ class Simulation(object):
                 return False
             elif (self.fault["fault"] == "D'" and self.simTable[self.fault["node"]] == '1'):
                 return False
-            # i can update the simTable with the fault
+            # if i observe a difference in the node then update the simTable
             self.simTable[self.fault["node"]] = self.fault["fault"]
         elif (self.fault["type"] == 2):
             if (self.fault["fault"] == 'D' and self.simTable[self.fault["input"]] == '0'):
                 return False
             elif (self.fault["fault"] == "D'" and self.simTable[self.fault["input"]] == '1'):
                 return False
-            # now i can update the simTable with the fault but I need to be careful
-            # i will compute the propagation of the fault to simplify the code
+            # if i observe a difference in the node then update the simTable
             node = self.circuit.nodes[self.fault["node"]]
             inputs_names = node.getFanIn().copy()
             inputs = []

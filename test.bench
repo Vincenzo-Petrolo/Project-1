@@ -1,0 +1,8 @@
+INPUT(a)
+INPUT(b)
+INPUT(c)
+g = AND(a,b)
+e = NOT(b)
+h = NAND(e,c)
+k = OR(g,h)
+OUTPUT(k)
