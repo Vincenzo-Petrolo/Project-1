@@ -1,6 +1,5 @@
 import time
 
-
 class Simulation(object):
 
     def __init__(self, circuit):
@@ -13,7 +12,10 @@ class Simulation(object):
         self.faults = {}
         # Levelize the circuit to optimize simulation
         circuit.levelize()
-        self._initialize()
+        self.fault = {"node": "", "input": "", "fault": "", "type": 0}
+        for node_name in sorted(self.circuit.levels, key=self.circuit.levels.get):
+          self.simTable[node_name] = 'X'
+        self.simTableCopy = self.simTable.copy()
         self.fault_detected = False
 
     def simulate(self, faults=None, tune = False):
@@ -67,8 +69,12 @@ class Simulation(object):
         # reset the fault if any
         self.fault = {"node": "", "input": "", "fault": "", "type": 0}
 
-        for node_name in sorted(self.circuit.levels, key=self.circuit.levels.get):
+        for node_name in self.simTable.keys():
           self.simTable[node_name] = 'X'
+    
+    def _resetTable(self):
+        self.fault = {"node": "", "input": "", "fault": "", "type": 0}
+        self.simTable = self.simTableCopy.copy()
 
     def _compute(self, node_name):
         # Avoid computing already computed gates
@@ -136,18 +142,20 @@ class Simulation(object):
       totalDetectedFaults = 0
       # this for takes O(faults)
       for fault in fault_list:
-        # reset the fault detected flag
+        # reset the fault detected and activation flags
         self.fault_detected = False
         self.fault_activated = True
         # if fault was already detected, then skip simulation
         if (self.faults[fault] == 1):
             continue
         # reset the simTable
-        self._initialize()
+        self._resetTable()
+
         for initialInput in self.initialSimTable.keys():
           self.simTable[initialInput] = self.initialSimTable[initialInput]
+
         # update the fault data structure with the new fault
-        if (self._updateFault(fault) == False):
+        if (self._updateFault(fault, tune=tune) == False):
             print("Bad fault insertion, aborting simulation")
             return
         # Start the simulation
@@ -190,7 +198,7 @@ class Simulation(object):
             self.initialSimTable[input_node] = input_string[i]
             i += 1
 
-    def _updateFault(self, newFault):
+    def _updateFault(self, newFault, tune=False):
         # Not in the correct format
         fault_type = newFault.count('-')
         if (fault_type != 2 and fault_type != 1):
@@ -198,10 +206,12 @@ class Simulation(object):
         fault = newFault.split('-')
         if (fault_type == 1):
             # Now validate the fault
-            if (fault[0] not in self.simTable.keys()):
-                return False
-            if (fault[1] != '0' and fault[1] != '1'):
-                return False
+            # if tune is true, skip validity check and go greedy
+            if (tune == False):
+                if (fault[0] not in self.simTable.keys()):
+                    return False
+                if (fault[1] != '0' and fault[1] != '1'):
+                    return False
             # Now update the fault
             self.fault = {
                 "node": fault[0],
@@ -212,15 +222,16 @@ class Simulation(object):
             return True
         else:
             # Now validate the fault
-            if (fault[0] not in self.simTable.keys()):
-                print("Fualt is not in simtable")
-                return False
-            if (fault[1] not in self.circuit.nodes[fault[0]].getFanIn()):
-                print("Input of the fault not its input")
-                return False
-            if (fault[2] != '0' and fault[2] != '1'):
-                print("bad kind of fault")
-                return False
+            if (tune == False):
+                if (fault[0] not in self.simTable.keys()):
+                    print("Fualt is not in simtable")
+                    return False
+                if (fault[1] not in self.circuit.nodes[fault[0]].getFanIn()):
+                    print("Input of the fault not its input")
+                    return False
+                if (fault[2] != '0' and fault[2] != '1'):
+                    print("bad kind of fault")
+                    return False
             # Update the internal dictionary
             self.fault = {
                 "node": fault[0],
