@@ -5,109 +5,11 @@ import random
 import matplotlib.pyplot as plt
 import statistics
 
-# Single TV - Single Fault program
-def program1():
-  # Clear the screen from previous output
-  os.system("clear")
-  print("Program 1 starting")
-  # Create the parser object
-  parser = p.Parser()
-  # Ask the user for the filename
-  filename = input("Insert the name of the file you want to load [default circ.bench]: ")
-  os.system("clear")
-  # default to circ.bench
-  if (len(filename) == 0):
-    filename = "circ.bench"
-  # Now load the file into the circuit data structure
-  circuit = parser.readFile(filename)
-  # Print informations about the circuit
-  print(f"|\tInput vector size \t|\t{len(circuit.inputs)}")
-  print(f"|\tOutput vector size\t|\t{len(circuit.outputs)}")
-  # Show more detailed informations
-  input("\nPress Enter to continue and show detailed analysis of the circuit...")
-  os.system("clear")
-  print(circuit)
-  #=====================================================================
-
-  # Simulate the circuit given 1 input test vector
-  input("Press Enter to enter the simulation phase...")
-  os.system("clear")
-
-  simulation = sim.Simulation(circuit)
-  # read the inputs to the circuit
-  simulation._get_inputs()
-  # perform the simulation
-  simulation.simulate()
-  # print the simulation result
-  simulation.printOutputs()
-  #=====================================================================
-  # Perform fault simulation
-  input("Press Enter to enter the fault simulation phase...")
-  os.system("clear")
-
-  fault = input("Write a single stuck-at fault (e.g. g-c-1) : ")
-  # get the full fault list, needed for the fault simulation
-  fault_list = circuit.getFullFaultList()
-  # load the fault list into the simulation
-  simulation._initFaults(fault_list)
-  # perform the simulation using the fault list and the same test vector
-  simulation.simulate([fault])
-  # Show the internal state
-  simulation.showInternalAndOutputNodes()
-  # Show if fault is detected
-  if (simulation.fault_activated == False):
-    print(f"Fault is not activated => No difference shown at output")
-    return
-  elif (simulation.fault_detected == False):
-    print(f"Fault could not be propagated") 
-    return
-  else:
-    print(f"Fault detected!")
-  #=====================================================================
-  
-  
-# Single TV - All faults
-def program2():
-  # Clear the screen from previous output
-  os.system("clear")
-  print("Program 2 starting")
-  # Create the parser object
-  parser = p.Parser()
-  # Ask the user for the filename
-  filename = input("Insert the name of the file you want to load [default circ.bench]: ")
-  os.system("clear")
-  # default to circ.bench
-  if (len(filename) == 0):
-    filename = "circ.bench"
-  # Now load the file into the circuit data structure
-  circuit = parser.readFile(filename)
-  # get the full fault list for the circuit
-  fault_list = circuit.getFullFaultList()
-  # display the full fault list
-  circuit.displayFaultList(fault_list)
-  # Print the total number of faults
-  print(f"\n#Faults\t=\t{len(fault_list)}\n")
-  
-  input("Press Enter to enter the perform fault coverage...")
-  os.system("clear")
-
-  simulator = sim.Simulation(circuit)
-  simulator._get_inputs()
-  os.system("clear")
-  # get the fault list
-  fault_list = circuit.getFullFaultList()
-  # load the fault list into the simulation
-  simulator._initFaults(fault_list)
-  print(f"Starting fault simulation, detected faults will be printed as they are discovered...\n")
-  # perform the fault simulation
-  simulator.simulate(fault_list)
-  
-      
 # Fault coverage of 1-10 TVs
 def program3():
   # Clear the screen from previous output
   os.system("clear")
-  print("Program 3 starting")
+  print("SCOAP Controllability computation")
   # Create the parser object
   parser = p.Parser()
   # Ask the user for the filename
@@ -115,24 +17,13 @@ def program3():
   os.system("clear")
   # default to circ.bench
   if (len(filename) == 0):
-    filename = "circ.bench"
+    filename = "p2.bench"
   # Now load the file into the circuit data structure
   circuit = parser.readFile(filename)
   # Now generate random inputs, and get fault coverage
   input_width = len(circuit.inputs)
-  # Create a dictionary to store coverage for each TV
-  coverage_series = []
-
-  # do fault collapse and get the fault list
-  # this will decrease the simulation time
-  circuit.doFaultCollapse()
-  fault_list = circuit.fault_list
 
   simulator = sim.Simulation(circuit)
-  # load the updated fault list into the simulator
-  simulator._initFaults(fault_list)
-  print(f"Starting simulation on {len(fault_list)} faults")
-  print(f"The program will execute {len(fault_list)*10} simulations, it could take a while...")
 
   # perform 10 simulations
   for i in range(0,10):
@@ -140,23 +31,18 @@ def program3():
     test_vector = generateBitVector(input_width)
     # provide it to the simulator
     simulator._get_inputs(test_vector)
-    # perform the simulation on the fault list
-    simulator.simulate(fault_list, tune=True)
-    # get the fault coverage
-    coverage_series.append(simulator.getFaultCoverage())
   
-  # After generate the plot
-  generatePlot(10, coverage_series)
+  ## After generate the plot
+  #generatePlot(10, coverage_series)
 
-  input("Press Enter if you want to get the mean and variance...")
-  os.system("clear")
+  #input("Press Enter if you want to get the mean and variance...")
+  #os.system("clear")
 
-  iterations = input("Number of iterations [time consuming operation, be careful!]: ")
-  os.system("clear")
+  #iterations = input("Number of iterations [time consuming operation, be careful!]: ")
+  #os.system("clear")
   
   # this is a time consuming operation, so perform it over small circuits
   # perform 10 times the same thing as above, and get mean and variance and display it
-  advancedComputations(simulator, fault_list, input_width, int(iterations))
   
 
 def generateBitVector(length):
