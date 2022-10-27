@@ -59,7 +59,16 @@ class SCOAP(object):
     # List of tuples containing controllabilities
     # [(c0, c1), (c0, c1), ...]
     def __AND_rule__(self, c_ins):
-        pass
+        c0_ins = []
+        c1_ins = []
+        for c_node in c_ins:
+            c0_ins.append(c_node[0])
+            c1_ins.append(c_node[1])
+
+        c0 = min(c0_ins) + 1
+        c1 = sum(c1_ins) + 1
+
+        return (c0, c1)
 
     def __NAND_rule__(self, c_ins):
         contr = self.__AND_rule__(c_ins)
@@ -67,7 +76,16 @@ class SCOAP(object):
         return (contr[1], contr[0])
 
     def __OR_rule__(self, c_ins):
-        pass
+        c0_ins = []
+        c1_ins = []
+        for c_node in c_ins:
+            c0_ins.append(c_node[0])
+            c1_ins.append(c_node[1])
+
+        c0 = min(c1_ins) + 1
+        c1 = sum(c0_ins) + 1
+
+        return (c0, c1)
 
     def __NOR_rule__(self, c_ins):
         contr = self.__OR_rule__(c_ins)
@@ -75,7 +93,10 @@ class SCOAP(object):
         return (contr[1], contr[0])
 
     def __NOT_rule__(self, c_ins):
-        pass
+        c0 = c_ins[0][1] + 1
+        c1 = c_ins[0][0] + 1
+
+        return (c0, c1)
 
     def __BUFF_rule__(self, c_ins):
         contr = self.__NOT_rule__(c_ins)
@@ -83,7 +104,14 @@ class SCOAP(object):
         return (contr[1], contr[0])
 
     def __XOR_rule__(self, c_ins):
-        pass
+        c0_ins = []
+        c1_ins = []
+        for c_node in c_ins:
+            c0_ins.append(c_node[0])
+            c1_ins.append(c_node[1])
+
+        c0 = min(sum(c0_ins), sum(c1_ins)) + 1
+        c1 = # problem here
 
     def __XNOR_rule__(self, c_ins):
         contr = self.__XOR_rule__(c_ins)
