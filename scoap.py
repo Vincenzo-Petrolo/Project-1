@@ -51,10 +51,6 @@ class SCOAP(object):
             self.controllability[node.name] = self.__NOT_rule__(c_ins)
         elif (node.function == __BUF__):
             self.controllability[node.name] = self.__BUFF_rule__(c_ins)
-        elif (node.function == __XOR__):
-            self.controllability[node.name] = self.__XOR_rule__(c_ins)
-        elif (node.function == __XNOR__):
-            self.controllability[node.name] = self.__XNOR_rule__(c_ins)
     
     # List of tuples containing controllabilities
     # [(c0, c1), (c0, c1), ...]
@@ -100,20 +96,5 @@ class SCOAP(object):
 
     def __BUFF_rule__(self, c_ins):
         contr = self.__NOT_rule__(c_ins)
-        # Swap the tuple
-        return (contr[1], contr[0])
-
-    def __XOR_rule__(self, c_ins):
-        c0_ins = []
-        c1_ins = []
-        for c_node in c_ins:
-            c0_ins.append(c_node[0])
-            c1_ins.append(c_node[1])
-
-        c0 = min(sum(c0_ins), sum(c1_ins)) + 1
-        c1 = # problem here
-
-    def __XNOR_rule__(self, c_ins):
-        contr = self.__XOR_rule__(c_ins)
         # Swap the tuple
         return (contr[1], contr[0])
