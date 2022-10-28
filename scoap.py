@@ -8,9 +8,18 @@ class SCOAP(object):
         pass
 
 
-    # Compute the controllability of the circuit
+    # return controllability
+    # and then print it
     def getControllability(self):
-        pass
+        self._computeControllability()
+
+        print(f"Node\t|\t(C0,C1)\t")
+        print(f"----\t|\t-------\t")
+
+        for node in self.controllability.keys():
+            print(f"{node}\t|\t{self.controllability[node]}")
+
+
 
     # Algorithm for computing controllability
     def _computeControllability(self):
@@ -19,12 +28,9 @@ class SCOAP(object):
         # Initialize the controllability with inputs
         self._initializeControllability()
         # Go through each sorted level
-        for level in self.levels.keys():
-            current_nodes = self.circuit.levels[level]
-            # Now compute the  controllability for each node
-            for node in current_nodes:
-                self._getNodeControllability(node)
-        # Now I'm done
+        for node_name in sorted(self.circuit.levels, key=self.circuit.levels.get):
+                if (node_name not in self.controllability.keys()):
+                    self._getNodeControllability(self.circuit.nodes[node_name])
     
     def _initializeControllability(self):
         # Initialize each input with (1,1)
@@ -35,7 +41,7 @@ class SCOAP(object):
         # Create a list with the controllability of the inputs
         c_ins = []
 
-        for input in node.inputs:
+        for input in node.fan_in:
             c_ins.append(self.controllability[input])
 
         # Compare the node function
@@ -78,8 +84,8 @@ class SCOAP(object):
             c0_ins.append(c_node[0])
             c1_ins.append(c_node[1])
 
-        c0 = min(c1_ins) + 1
-        c1 = sum(c0_ins) + 1
+        c0 = sum(c0_ins) + 1
+        c1 = min(c1_ins) + 1
 
         return (c0, c1)
 

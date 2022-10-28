@@ -4,9 +4,10 @@ import simulation as sim
 import random
 import matplotlib.pyplot as plt
 import statistics
+import scoap
 
 # Fault coverage of 1-10 TVs
-def program3():
+def program():
   # Clear the screen from previous output
   os.system("clear")
   print("SCOAP Controllability computation")
@@ -20,8 +21,17 @@ def program3():
     filename = "p2.bench"
   # Now load the file into the circuit data structure
   circuit = parser.readFile(filename)
+
+  s = scoap.SCOAP(circuit)
+  controllability = s.getControllability()
+
+
+  return
   # Now generate random inputs, and get fault coverage
   input_width = len(circuit.inputs)
+
+
+
 
   simulator = sim.Simulation(circuit)
 
