@@ -13,11 +13,14 @@ class SCOAP(object):
     def getControllability(self):
         self._computeControllability()
 
+        print("Controllability:")
         print(f"Node\t|\t(C0,C1)\t")
         print(f"----\t|\t-------\t")
 
         for node in self.controllability.keys():
             print(f"{node}\t|\t{self.controllability[node]}")
+        
+        return self.controllability
 
 
 
