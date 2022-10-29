@@ -1,9 +1,0 @@
-# fully fanout circuit
-INPUT(a)
-b = AND(a,a)
-c = NAND(b,b)
-d = OR(c,c)
-e = NOR(d,d)
-f = XOR(e,e)
-h = XNOR(f,f)
-OUTPUT(h)

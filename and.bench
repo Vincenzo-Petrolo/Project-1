@@ -1,4 +1,0 @@
-c = AND(a,b)
-INPUT(a)
-INPUT(b)
-OUTPUT(c)

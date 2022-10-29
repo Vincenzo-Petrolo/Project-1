@@ -25,10 +25,20 @@ def program():
   s = scoap.SCOAP(circuit)
   controllability = s.getControllability()
 
+  input_width = len(circuit.inputs)
+
+  simulator = sim.Simulation(circuit)
+
+  # Montecarlo simulation
+  input_patterns = []
+  # Generate 100 different input patterns
+  for i in range(0, 100):
+    simulator._get_inputs(generateBitVector(input_width))
+
+
+
 
   return
-  # Now generate random inputs, and get fault coverage
-  input_width = len(circuit.inputs)
 
 
 

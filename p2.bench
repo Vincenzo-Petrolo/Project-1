@@ -1,0 +1,13 @@
+#p2.bench
+INPUT(a)
+INPUT(b)
+INPUT(c)
+INPUT(d)
+g =AND(a, b)
+k=OR(g, c)
+i=NOT(g)
+e=NOT(b)
+y=NAND(i, k)
+z=NOR(k, e, d)
+OUTPUT(y)
+OUTPUT(z)
