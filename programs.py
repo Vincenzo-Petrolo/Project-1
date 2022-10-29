@@ -1,3 +1,4 @@
+from fileinput import filename
 import os
 import parser as p
 import simulation as sim
@@ -14,11 +15,20 @@ def program():
   # Create the parser object
   parser = p.Parser()
   # Ask the user for the filename
-  filename = input("Insert the name of the file you want to load [default circ.bench]: ")
+  print("[1] p2.bench")
+  print("[2] c1908.bench")
+  number = int(input("Select which bench to use: "))
+
+  if (number not in [1,2]):
+    print("Error, not valid!!")
+    return -1
+
   os.system("clear")
-  # default to circ.bench
-  if (len(filename) == 0):
+  if (number == 1):
     filename = "p2.bench"
+  elif (number == 2):
+    filename = "c1908.bench"
+
   # Now load the file into the circuit data structure
   circuit = parser.readFile(filename)
 
