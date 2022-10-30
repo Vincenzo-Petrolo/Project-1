@@ -1,0 +1,11 @@
+INPUT(a)
+INPUT(b)
+OUTPUT(x)
+
+c = NAND(a,b)
+d = NAND(c,a)
+e = NAND(c,b)
+g = NAND(d,e)
+h = NAND(a,g)
+i = NAND(b,g)
+x = NAND(h,i)

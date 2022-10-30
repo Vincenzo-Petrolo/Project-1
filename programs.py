@@ -17,9 +17,10 @@ def program():
   # Ask the user for the filename
   print("[1] p2.bench")
   print("[2] c1908.bench")
+  print("[3] reconv.bench")
   number = int(input("Select which bench to use: "))
 
-  if (number not in [1,2]):
+  if (number not in [1,2,3]):
     print("Error, not valid!!")
     return -1
 
@@ -28,6 +29,8 @@ def program():
     filename = "p2.bench"
   elif (number == 2):
     filename = "c1908.bench"
+  elif (number == 3):
+    filename = "reconv.bench"
 
   # Now load the file into the circuit data structure
   circuit = parser.readFile(filename)
