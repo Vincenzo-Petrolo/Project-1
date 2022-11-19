@@ -1,6 +1,7 @@
 import os
 import parser as p
-import simulation as sim
+from simulation import * 
+
 import matplotlib.pyplot as plt
 
 # Single TV - Single Fault program
@@ -23,3 +24,17 @@ def program1():
   input("\nPress Enter to continue and show detailed analysis of the circuit...")
   os.system("clear")
   print(circuit)
+
+  seqsim = SequentialSimulation(circuit)
+
+  __ZERO__ = ('0', '0')
+  __ONE__ = ('1', '1')
+
+  test_sequence = [
+    {'a' : __ONE__},
+    {'a' : __ZERO__},
+    {'a' : __ONE__},
+    {'a' : __ONE__}
+  ]
+
+  seqsim.simulate(test_sequence=test_sequence, ff_init_values={})
