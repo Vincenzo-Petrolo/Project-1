@@ -37,4 +37,4 @@ def program1():
     {'a' : __ONE__}
   ]
 
-  seqsim.simulate(test_sequence=test_sequence, ff_init_values={})
+  seqsim.simulate(test_sequence=test_sequence, ff_init_values={}, fault="a-0")

@@ -8,14 +8,15 @@ class SequentialSimulation(object):
         # This will hold all the values of the nodes
         # throught the simulation
         self.simTableHistory = []
+        self.fault = {}
     
 
-    def simulate(self, test_sequence = [], ff_init_values = {}):
+    def simulate(self, test_sequence = [], ff_init_values = {}, fault = ""):
         first = True
-        test_ctr = 0
+
+        self._updateFault(fault)
 
         for test_vector in test_sequence:
-            print(f"Cycle #{test_ctr}")
             # Generate a simTable
             newTable = self._getEmptySimTable()
             self.simTableHistory.append(newTable)
@@ -29,9 +30,24 @@ class SequentialSimulation(object):
                 self._updateFlipFlop()
 
             self._step(test_vector)
-            test_ctr += 1
         
         self._simulationReport()
+    
+    def _updateFault(self, fault):
+        # Fault can be either x-y-0 or x-0
+        split_str = fault.split('-')
+        if (len(split_str) == 2):
+            self.fault['type'] = 2
+            self.fault['node'] = split_str[0]
+            self.fault['stuck_at'] = split_str[1]
+        elif (len(split_str) == 3):
+            self.fault['type'] = 3
+            self.fault['input_node'] = split_str[1]
+            self.fault['involved_gate'] = split_str[0]
+            self.fault['stuck_at'] = split_str[2]
+        
+        
+
 
     def _updateFlipFlop(self):
         for node in self.circuit.nodes.values():
@@ -50,7 +66,6 @@ class SequentialSimulation(object):
         self._applyInputs(inputs)
         # Compute one cycle
         self._computeNodes()
-        print(self.simTableHistory[-1])
     
     def _generateRandomInputs(self):
         # Get random inputs
@@ -66,6 +81,11 @@ class SequentialSimulation(object):
         # Copy the inputs into the table
         for key, val in inputs.items():
             self.simTableHistory[-1][key] = val
+
+            if (('type' in self.fault)):
+                if (self.fault['type'] == 2):
+                    if (self.fault['node'] == key):
+                        self.simTableHistory[-1][key] = (val[0], self.fault['stuck_at'])
     
     def _initFlipFlops(self, ff_values):
         for key, val in ff_values.items():
@@ -107,7 +127,13 @@ class SequentialSimulation(object):
         bad_inputs = []
         for i in inputs_names:
             good_inputs.append(self.simTableHistory[-1][i][0])
-            bad_inputs.append(self.simTableHistory[-1][i][1])
+            if (('type' in self.fault) and
+                (self.fault['type'] == 3) and
+                (self.fault['involved_gate'] == node_name) and
+                (self.fault['input_node'] == i)):
+                bad_inputs.append(self.fault['stuck_at'])
+            else:
+                bad_inputs.append(self.simTableHistory[-1][i][1])
     
         if (node.function != circuit.__DFF__):
             good_output = node.function(good_inputs)
@@ -116,6 +142,11 @@ class SequentialSimulation(object):
             # Don't do anything if DFF
             good_output = self.simTableHistory[-1][node_name][0]
             bad_output = self.simTableHistory[-1][node_name][1]
+        
+        if (('type' in self.fault)):
+            if (self.fault['type'] == 2):
+                if (self.fault['node'] == node_name):
+                    bad_output = self.fault['stuck_at']
 
         return (good_output, bad_output)
 
