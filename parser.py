@@ -112,5 +112,7 @@ class Parser(object):
       gate_node.function = cr.__NOT__
     elif (gate_name == "BUFF"):
       gate_node.function = cr.__BUF__
+    elif (gate_name == "DFF"):
+      gate_node.function = cr.__DFF__
 
     return gate_node

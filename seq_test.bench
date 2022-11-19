@@ -1,0 +1,9 @@
+INPUT(a)
+
+e = DFF(b)
+c = DFF(a)
+
+b = NAND(a,e)
+g = NOT(c)
+y = OR(e,g)
+OUTPUT(y)

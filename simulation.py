@@ -247,3 +247,10 @@ class Simulation(object):
                     output_name] == "D'":
                 return True
         return False
+
+
+# Sequential simulation class
+class SequentialSimulation(Simulation):
+    def __init__(self, circuit):
+        super().__init__(circuit)
+    

@@ -489,3 +489,6 @@ def __NOT__(inputs_list):
 
 def __BUF__(inputs_list):
   return inputs_list[0]
+
+def __DFF__(inputs_list):
+  return inputs_list[0]
