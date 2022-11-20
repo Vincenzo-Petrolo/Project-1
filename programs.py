@@ -20,10 +20,10 @@ def program1():
   # Now load the file into the circuit data structure
   circuit = parser.readFile(filename)
   # Print informations about the circuit
+  print(circuit)
   # Show more detailed informations
   input("\nPress Enter to continue and show detailed analysis of the circuit...")
   os.system("clear")
-  print(circuit)
 
   seqsim = SequentialSimulation(circuit)
 
@@ -37,4 +37,9 @@ def program1():
     {'a' : __ONE__}
   ]
 
-  seqsim.simulate(test_sequence=test_sequence, ff_init_values={}, fault="a-0")
+  ff_init_values = {
+    'e' : __ONE__,
+    'c' : __ONE__
+  }
+
+  seqsim.simulate(test_sequence=test_sequence, ff_init_values=ff_init_values, fault="y-0")

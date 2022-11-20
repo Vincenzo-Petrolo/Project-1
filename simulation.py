@@ -175,13 +175,28 @@ class SequentialSimulation(object):
         for node in self.simTableHistory[-1]:
             print(f"{node}\t\t|", end='')
             for simTable in self.simTableHistory:
-                print(f"{simTable[node]}\t\t|", end='')
+                pretty_value = self._printNodeValue(simTable[node])
+                print(f"{pretty_value}\t\t|", end='')
             print("")
             
     
     def _writeGrid(self):
         print(f"Node\t\t|", end='')
         for i in range(len(self.simTableHistory)):
-            print(f"{i}\t\t\t|", end='')
+            print(f"{i}\t\t|", end='')
         print("")
             
+    def _printNodeValue(self, node_value):
+        # Covers (0,0), (1,1), (u,u)
+        if (node_value[0] == node_value[1]):
+            return node_value[0]
+        
+        # Covers D, D'
+        if (node_value[0] == '1' and node_value[1] == '0'):
+            return 'D'
+        elif (node_value[0] == '0' and node_value[1] == '1'):
+            return "D'"
+
+        # Covers 1,u, u,1 , 0,u, u,0
+        return node_value[0]+','+node_value[1]
+
