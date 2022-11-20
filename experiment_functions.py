@@ -50,3 +50,43 @@ def getRandomFFinitValues(circuit, percentage):
         current_percentage += step
     
     return init_map
+
+def getSolidFFInitValues(circuit, value):
+    FFs = circuit.getDFFs()
+    init_map = {}
+
+    for FF in FFs:
+        init_map[FF] = value
+
+def getAlternatedFFInitValues(circuit, starting_value):
+    FFs = circuit.getDFFs()
+    init_map = {}
+
+    for i in range(len(FFs)):
+        if (i % 2 == 0):
+            init_map[FFs[i]] = starting_value
+        else:
+            init_map[FFs[i]] = negate(starting_value)
+
+def getFanOutFFInitValues(circuit, fanout_th, init_value):
+    FFs = circuit.getDFFSortedByFanOut()
+    print(FFs)
+    init_map = {}
+
+    for FF_name, fan_out in FFs.items():
+        if (fan_out >= fanout_th):
+            init_map[FF_name] = init_value
+
+    return init_map
+
+
+
+
+# =============================================================================================
+# Utility functions
+# =============================================================================================
+def negate(value):
+    if (value == __ZERO__):
+        return __ONE__
+    
+    return __ZERO__

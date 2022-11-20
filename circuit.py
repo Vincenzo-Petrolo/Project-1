@@ -69,6 +69,9 @@ class Circuit(object):
     # initialize the input level to 0
     for nodeName in self.inputs.keys():
       self.levels[nodeName] = 0
+    # initialize all FFs to level 0
+    for dff in self.getDFFs():
+      self.levels[dff] = 0
     # until every gate is not assigned
     # with a valid level do the loop
     while finish is False:
@@ -224,6 +227,18 @@ class Circuit(object):
         FF_list.append(node.name)
 
     return FF_list
+
+  def getDFFSortedByFanOut(self):
+    scoreboard = {}
+    for FF in self.getDFFs():
+      scoreboard[FF] = 0
+
+    for node in self.nodes.values():
+      for input in node.getFanIn():
+        if (input in scoreboard):
+          scoreboard[input] += 1
+    
+    return scoreboard
   
   def getInputs(self):
     return self.inputs.keys()

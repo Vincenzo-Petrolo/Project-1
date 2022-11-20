@@ -35,6 +35,7 @@ def program1():
   test_sequence = getRandomTestSequence(circuit=circuit, length=3)
 
   ff_init_values = getRandomFFinitValues(circuit=circuit, percentage=0.3)
+  getFanOutFFInitValues(circuit=circuit, fanout_th=1, init_value=__ZERO__)
   print(ff_init_values)
 
   seqsim.simulate(test_sequence=test_sequence, ff_init_values=ff_init_values, fault="y-0")
