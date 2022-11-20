@@ -15,6 +15,8 @@ class SequentialSimulation(object):
         first = True
 
         self._updateFault(fault)
+        # Reset simTableHistory
+        self.simTableHistory = []
 
         for test_vector in test_sequence:
             # Generate a simTable
@@ -31,7 +33,7 @@ class SequentialSimulation(object):
 
             self._step(test_vector)
         
-        self._simulationReport()
+        #self._simulationReport()
     
     def _updateFault(self, fault):
         # Fault can be either x-y-0 or x-0
@@ -200,3 +202,10 @@ class SequentialSimulation(object):
         # Covers 1,u, u,1 , 0,u, u,0
         return node_value[0]+','+node_value[1]
 
+    def numberDetectedOutputs(self):
+        counter = 0
+        for output_node in self.circuit.outputs.keys():
+            if (self.simTableHistory[-1][output_node] in [('0', '1'), ('1', '0')]):
+                counter += 1
+
+        return counter

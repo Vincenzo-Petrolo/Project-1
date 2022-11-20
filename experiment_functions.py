@@ -1,4 +1,6 @@
 import random
+from chromosome import chromosome
+from population import population
 
 __ZERO__ = ('0', '0')
 __ONE__ = ('1', '1')
@@ -70,12 +72,41 @@ def getAlternatedFFInitValues(circuit, starting_value):
 
 def getFanOutFFInitValues(circuit, fanout_th, init_value):
     FFs = circuit.getDFFSortedByFanOut()
-    print(FFs)
     init_map = {}
 
     for FF_name, fan_out in FFs.items():
         if (fan_out >= fanout_th):
             init_map[FF_name] = init_value
+
+    return init_map
+
+def getFFInitValuesUsingGeneticAlgorithm(circuit, simulator, test_sequence):
+    FFs = circuit.getDFFs()
+    init_map = {}
+    # I create a population with chromosomes of length same as the number of FFs
+    # Starting population is 10
+    # The threshold for termination is 80%
+    # The chance of mutation during crossover is 50%
+    p = population(len(FFs),10,0.8,0.5)
+
+    terminate = 0
+    i = 1
+    while (terminate == 0):
+        # select top 3 parents for crossover
+        p.selection(3, [circuit, simulator, "", test_sequence])
+        # perform crossover
+        terminate = p.crossover()
+        i += 1
+    
+    p.selection(1, [circuit, simulator, "", test_sequence])
+
+    final_chromosome = p._population[0].get_chromosome()
+
+    for i in range(len(FFs)):
+        if (final_chromosome[i] == 0):
+            init_map[FFs[i]] = __ZERO__
+        elif (final_chromosome[i] == 1):
+            init_map[FFs[i]] = __ONE__
 
     return init_map
 
