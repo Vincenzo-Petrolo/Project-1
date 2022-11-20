@@ -1,9 +1,17 @@
 # Project 1 main
 
-from programs import program1
+from programs import experimentRandom
 
 def main():  
-  program1()
+  # Perform experiment
+  experimentRandom(
+    circuit_name="seq_test.bench",
+    n_runs=1,
+    n_test_sequence=5,
+    percentage=1,
+    test_sequence_length=3
+  )
+
 
 if __name__ == "__main__":
   main()
