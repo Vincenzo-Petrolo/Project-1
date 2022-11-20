@@ -2,6 +2,8 @@ import os
 import parser as p
 from simulation import * 
 
+from experiment_functions import *
+
 import matplotlib.pyplot as plt
 
 # Single TV - Single Fault program
@@ -30,16 +32,9 @@ def program1():
   __ZERO__ = ('0', '0')
   __ONE__ = ('1', '1')
 
-  test_sequence = [
-    {'a' : __ONE__},
-    {'a' : __ZERO__},
-    {'a' : __ONE__},
-    {'a' : __ONE__}
-  ]
+  test_sequence = getRandomTestSequence(circuit=circuit, length=3)
 
-  ff_init_values = {
-    'e' : __ONE__,
-    'c' : __ONE__
-  }
+  ff_init_values = getRandomFFinitValues(circuit=circuit, percentage=0.3)
+  print(ff_init_values)
 
   seqsim.simulate(test_sequence=test_sequence, ff_init_values=ff_init_values, fault="y-0")

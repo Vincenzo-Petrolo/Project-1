@@ -215,6 +215,19 @@ class Circuit(object):
     self._wireEquivalenceCollapse()
     self._gateEquivalenceCollapse()
     self._gateDominanceCollapse()
+  
+  def getDFFs(self):
+    FF_list = []
+
+    for node in self.nodes.values():
+      if (node.function == __DFF__):
+        FF_list.append(node.name)
+
+    return FF_list
+  
+  def getInputs(self):
+    return self.inputs.keys()
+
 
 class Node(object):
   def __init__(self, node_name):
