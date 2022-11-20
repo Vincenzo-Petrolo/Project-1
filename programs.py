@@ -32,12 +32,20 @@ def program1():
   __ZERO__ = ('0', '0')
   __ONE__ = ('1', '1')
 
-  test_sequence = getRandomTestSequence(circuit=circuit, length=3)
+  test_sequence = getRandomTestSequence(circuit=circuit, length=5)
 
   ff_init_values = getFFInitValuesUsingGeneticAlgorithm(circuit=circuit, simulator=seqsim, test_sequence=test_sequence)
-  print(ff_init_values)
+  fault_list = circuit.getFullFaultList()
+  # Pick a random fault
+  fault = random.choice(fault_list)
 
   #ff_init_values = getRandomFFinitValues(circuit=circuit, percentage=0.3)
 
-  seqsim.simulate(test_sequence=test_sequence, ff_init_values=ff_init_values, fault="y-0")
+  os.system("clear")
+  print("Simulation log")
+  seqsim.simulate(test_sequence=test_sequence, ff_init_values=ff_init_values, fault=fault)
   seqsim._simulationReport()
+
+  print(f"===============================================================")
+  print(f"FF initialized to {ff_init_values}")
+  print(f"Fault {fault} detected: {seqsim.faultDetected()}")
