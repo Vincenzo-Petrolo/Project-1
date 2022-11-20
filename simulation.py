@@ -209,3 +209,9 @@ class SequentialSimulation(object):
                 counter += 1
 
         return counter
+    
+    def faultDetected(self):
+        if (self.numberDetectedOutputs() > 0):
+            return True
+
+        return False
