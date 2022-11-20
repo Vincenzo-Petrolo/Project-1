@@ -1,5 +1,4 @@
 import random
-from chromosome import chromosome
 from population import population
 
 __ZERO__ = ('0', '0')
@@ -29,28 +28,16 @@ def getRandomTestSequence(circuit, length):
 
 # Returns an initialization map for the FFs of a circuit
 # Initialize only a given percentage of randomly picked FFs
-def getRandomFFinitValues(circuit, percentage):
-    current_percentage = 0
+def getRandomFFinitValues(circuit):
     init_map = {}
 
-    if (percentage < 0 or percentage > 1):
-        raise Exception
-
     FFs = circuit.getDFFs()
-    step = 1/len(FFs)
 
-    while (current_percentage < percentage):
-        # Try to pick always a new FF
-        chosen_FF = random.choice(FFs)
-        while (chosen_FF in init_map):
-            chosen_FF = random.choice(FFs)
-        
+    for FF in FFs:
         # Randomly initialize the FF
-        init_map[chosen_FF] = random.choice([__ZERO__, __ONE__])
+        init_map[FF] = random.choice([__ZERO__, __ONE__])
 
-        # Increase the step
-        current_percentage += step
-    
+
     return init_map
 
 def getSolidFFInitValues(circuit, value):
