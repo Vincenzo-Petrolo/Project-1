@@ -58,6 +58,8 @@ def getAlternatedFFInitValues(circuit, starting_value):
             init_map[FFs[i]] = starting_value
         else:
             init_map[FFs[i]] = negate(starting_value)
+    
+    return init_map
 
 def getFanOutFFInitValues(circuit, fanout_th, init_value):
     FFs = circuit.getDFFSortedByFanOut()
