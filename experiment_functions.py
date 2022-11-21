@@ -46,6 +46,8 @@ def getSolidFFInitValues(circuit, value):
 
     for FF in FFs:
         init_map[FF] = value
+    
+    return init_map
 
 def getAlternatedFFInitValues(circuit, starting_value):
     FFs = circuit.getDFFs()
