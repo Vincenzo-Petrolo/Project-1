@@ -27,7 +27,7 @@ class chromosome():
             offspringA[i] = offspringB[i]
             offspringB[i] = self._chromosome[i]
 
-        print(f"From parentA: {self._chromosome} and parentB: {parentB.get_chromosome()} with crossover point {crossover_point} => {offspringA} and {offspringB}")
+        #print(f"From parentA: {self._chromosome} and parentB: {parentB.get_chromosome()} with crossover point {crossover_point} => {offspringA} and {offspringB}")
         # return two offsprings
         return [chromosome(None, offspringA), chromosome(None,offspringB)]
     
@@ -35,7 +35,7 @@ class chromosome():
     def mutate(self, probability):
         for i in range(0,len(self._chromosome)):
             if (random.random() <= probability):
-                print("Mutation occurred!")
+                #print("Mutation occurred!")
                 # flip the bit
                 if (self._chromosome[i] == 0):
                     self._chromosome[i] = 1
